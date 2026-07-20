@@ -2,7 +2,7 @@ import * as assert from "assert";
 import { ApexOSLanguageService } from "../../language-service/src/haLanguageService";
 import { TextDocument, CompletionItem } from "vscode-languageserver-protocol";
 import { IHaConnection } from "../../language-service/src/apexos/haConnection";
-import { HassEntities } from "home-assistant-js-websocket";
+import { ApexEntities } from "@apexinfosysindia/js-websocket";
 import { ApexOSConfiguration } from "../../language-service/src/haConfig/haConfig";
 import { getLanguageService } from "yaml-language-server/out/server/src/languageservice/yamlLanguageService";
 import { SchemaServiceForIncludes } from "../../language-service/src/schemas/schemaService";
@@ -25,7 +25,7 @@ class MockFileAccessor {
 
 // Mock ApexOS connection (simplified for secrets testing)
 class MockHaConnection implements IHaConnection {
-  private mockEntities: HassEntities = {};
+  private mockEntities: ApexEntities = {};
 
   async tryConnect(): Promise<void> {
     // Mock implementation
@@ -63,7 +63,7 @@ class MockHaConnection implements IHaConnection {
     return []; 
   }
   
-  async getHassEntities(): Promise<HassEntities> {
+  async getHassEntities(): Promise<ApexEntities> {
     return this.mockEntities;
   }
 

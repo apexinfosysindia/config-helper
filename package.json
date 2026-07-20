@@ -748,7 +748,7 @@
   "dependencies": {
     "axios": "^1.13.2",
     "bufferutil": "^4.0.9",
-    "home-assistant-js-websocket": "^9.5.0",
+    "@apexinfosysindia/js-websocket": "9.6.2",
     "utf-8-validate": "^6.0.5",
     "vscode-json-languageservice": "^5.6.3",
     "vscode-languageclient": "^9.0.1",

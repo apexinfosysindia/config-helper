@@ -6,14 +6,14 @@ import {
 import axios, { Method } from "axios";
 import {
   type Connection,
-  type HassEntities,
-  type HassServices,
+  type ApexEntities,
+  type ApexServices,
   type AuthData,
   createConnection as haCreateConnection,
   Auth as HaAuth,
   subscribeEntities,
   subscribeServices,
-} from "home-assistant-js-websocket";
+} from "@apexinfosysindia/js-websocket";
 import { IConfigurationService } from "../configuration";
 import { createSocket } from "./socket";
 
@@ -105,7 +105,7 @@ export interface HassEntityRegistry {
 // Normal require(), and cast to the static type
 // const ha =
 
-// require("home-assistant-js-websocket/dist/haws.cjs") as typeof import("home-assistant-js-websocket");
+// require("@apexinfosysindia/js-websocket/dist/apexws.cjs") as typeof import("@apexinfosysindia/js-websocket");
 
 export interface IHaConnection {
   tryConnect(): Promise<void>;
@@ -117,10 +117,10 @@ export interface IHaConnection {
   getFloorCompletions(): Promise<CompletionItem[]>;
   getLabelCompletions(): Promise<CompletionItem[]>;
   getServiceCompletions(): Promise<CompletionItem[]>;
-  getHassEntities(): Promise<HassEntities>;
+  getHassEntities(): Promise<ApexEntities>;
   getHassDevices(): Promise<HassDevices>;
   getHassEntityRegistry(): Promise<HassEntityRegistry>;
-  getHassServices(): Promise<HassServices>;
+  getHassServices(): Promise<ApexServices>;
   resolveEntityCompletionDocumentation(entityId: string): Promise<MarkupContent | undefined>;
 }
 
@@ -131,7 +131,7 @@ export class HaConnection implements IHaConnection {
 
   private hassDevices!: Promise<HassDevices>;
 
-  private hassEntities!: Promise<HassEntities>;
+  private hassEntities!: Promise<ApexEntities>;
 
   private hassEntityRegistry!: Promise<HassEntityRegistry>;
 
@@ -139,11 +139,11 @@ export class HaConnection implements IHaConnection {
 
   private hassLabels!: Promise<HassLabels>;
 
-  private hassServices!: Promise<HassServices>;
+  private hassServices!: Promise<ApexServices>;
 
   // Cache the current entities to avoid memory churn from subscription updates
-  private currentEntitiesCache: HassEntities | undefined;
-  private currentServicesCache: HassServices | undefined;
+  private currentEntitiesCache: ApexEntities | undefined;
+  private currentServicesCache: ApexServices | undefined;
 
   // Track unsubscribe functions to prevent memory leaks
   private unsubscribeEntities: (() => void) | undefined;
@@ -211,24 +211,24 @@ export class HaConnection implements IHaConnection {
     }
     
     // Create proper WebSocket URL from HTTP URL
-    const hassUrl = this.configurationService.url || "";
+    const apexUrl = this.configurationService.url || "";
     let wsUrl = "";
     
-    if (hassUrl) {
+    if (apexUrl) {
       try {
         // Remove trailing slashes to prevent double slashes in the path
-        const normalizedUrl = hassUrl.replace(/\/+$/, "");
+        const normalizedUrl = apexUrl.replace(/\/+$/, "");
         const url = new URL(`${normalizedUrl}/api/websocket`);
         const wsProtocol = url.protocol === "https:" ? "wss:" : "ws:";
         wsUrl = `${wsProtocol}//${url.host}${url.pathname}`;
         console.log(`Generated WebSocket URL: ${wsUrl}`);
       } catch (error) {
-        console.error(`Failed to generate WebSocket URL from ${hassUrl}:`, error);
+        console.error(`Failed to generate WebSocket URL from ${apexUrl}:`, error);
       }
     }
     
     // Log token status before connection
-    console.log(`Creating ApexOS connection to URL: ${hassUrl}`);
+    console.log(`Creating ApexOS connection to URL: ${apexUrl}`);
     const hasToken = !!this.configurationService.token;
     console.log(`Token available for connection: ${hasToken ? "Yes" : "No"}`);
     if (hasToken) {
@@ -246,7 +246,7 @@ export class HaConnection implements IHaConnection {
       expires_in: +new Date(new Date().getTime() + 1e11),
       refresh_token: "",
       // Custom property for HTTP URL that may be used in custom components
-      hassUrl: hassUrl,
+      apexUrl: apexUrl,
     } as AuthData);
 
     try {
@@ -373,7 +373,7 @@ export class HaConnection implements IHaConnection {
         detailedError = "Connection was established but then lost. The server might be restarting.";
         break;
       case 4:
-        errorText = "ERR_HASS_HOST_REQUIRED";
+        errorText = "ERR_APEX_HOST_REQUIRED";
         detailedError = "No ApexOS host URL configured. Please set a valid host URL.";
         break;
       case "ERR_MISSING_WS_URL":
@@ -705,7 +705,7 @@ export class HaConnection implements IHaConnection {
     return completions;
   }
 
-  public async getHassEntities(): Promise<HassEntities> {
+  public async getHassEntities(): Promise<ApexEntities> {
     // If we have a cached value, return it immediately
     // This is updated in real-time by the subscription callback
     if (this.currentEntitiesCache !== undefined) {
@@ -719,7 +719,7 @@ export class HaConnection implements IHaConnection {
 
     await this.createConnection();
 
-    this.hassEntities = new Promise<HassEntities>(
+    this.hassEntities = new Promise<ApexEntities>(
       // eslint-disable-next-line no-async-promise-executor
       async (resolve, reject) => {
         if (!this.connection) {
@@ -1145,7 +1145,7 @@ export class HaConnection implements IHaConnection {
     return completions;
   }
 
-  public async getHassServices(): Promise<HassServices> {
+  public async getHassServices(): Promise<ApexServices> {
     // If we have a cached value, return it immediately
     // This is updated in real-time by the subscription callback
     if (this.currentServicesCache !== undefined) {
@@ -1159,7 +1159,7 @@ export class HaConnection implements IHaConnection {
 
     await this.createConnection();
 
-    this.hassServices = new Promise<HassServices>(
+    this.hassServices = new Promise<ApexServices>(
       // eslint-disable-next-line no-async-promise-executor
       async (resolve, reject) => {
         if (!this.connection) {
@@ -1174,7 +1174,7 @@ export class HaConnection implements IHaConnection {
 
         // Subscribe to services and update cache on every change
         // This prevents memory churn from creating new promise values on each update
-        this.unsubscribeServices = subscribeServices(this.connection, (services: HassServices) => {
+        this.unsubscribeServices = subscribeServices(this.connection, (services: ApexServices) => {
           console.log(
             `Got ${Object.keys(services).length} services from ApexOS`,
           );

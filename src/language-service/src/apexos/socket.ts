@@ -5,7 +5,7 @@ https://github.com/apexinfosysindia/js-websocket
 
 */
 
-import type { Auth } from "home-assistant-js-websocket/dist/auth";
+import type { Auth } from "@apexinfosysindia/js-websocket";
 
 import WebSocket from "ws";
 
@@ -23,7 +23,7 @@ interface HaWebSocket extends WebSocket {
 }
 
 export function createSocket(
-  auth: Auth & { hassUrl?: string },
+  auth: Auth & { apexUrl?: string },
   ignoreCertificates: boolean,
 ): Promise<any> {
   // Convert from http:// -> ws://, https:// -> wss://
@@ -136,7 +136,7 @@ export function createSocket(
             wsUrl: auth.wsUrl,
             hasToken: !!auth.accessToken,
             isExpired: auth.expired,
-            hassUrl: (auth as any).hassUrl // Use type assertion for custom property
+            apexUrl: (auth as any).apexUrl // Use type assertion for custom property
           });
           invalidAuth = true;
         } else if (token.trim() === "") {

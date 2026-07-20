@@ -2,7 +2,7 @@ import * as assert from "assert";
 import { ApexOSLanguageService } from "../../language-service/src/haLanguageService";
 import { TextDocument, CompletionItem, CompletionItemKind, MarkupContent } from "vscode-languageserver-protocol";
 import { IHaConnection } from "../../language-service/src/apexos/haConnection";
-import { HassServices } from "home-assistant-js-websocket";
+import { ApexServices } from "@apexinfosysindia/js-websocket";
 import { ApexOSConfiguration } from "../../language-service/src/haConfig/haConfig";
 import { getLanguageService } from "yaml-language-server/out/server/src/languageservice/yamlLanguageService";
 import { SchemaServiceForIncludes } from "../../language-service/src/schemas/schemaService";
@@ -16,7 +16,7 @@ class MockFileAccessor {
 
 // Mock ApexOS connection with predefined services
 class MockHaConnection implements IHaConnection {
-  private mockServices: HassServices = {
+  private mockServices: ApexServices = {
     light: {
       turn_on: {
         name: "Turn on",
@@ -188,7 +188,7 @@ class MockHaConnection implements IHaConnection {
     return {};
   }
 
-  async getHassServices(): Promise<HassServices> {
+  async getHassServices(): Promise<ApexServices> {
     return this.mockServices;
   }
 

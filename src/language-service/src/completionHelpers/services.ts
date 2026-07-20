@@ -6,7 +6,7 @@ import {
   Thenable,
 } from "vscode-json-languageservice";
 import { IHaConnection } from "../apexos/haConnection";
-import { HassService } from "home-assistant-js-websocket";
+import { ApexService } from "@apexinfosysindia/js-websocket";
 
 export class ServicesCompletionContribution implements JSONWorkerContribution {
   public static propertyMatches: string[] = ["service", "action"];
@@ -141,7 +141,7 @@ export class ServicesCompletionContribution implements JSONWorkerContribution {
     return /^[a-z_]+\.[a-z0-9_]+$/.test(value);
   }
 
-  private async createActionHoverMarkdown(domain: string, serviceName: string, service: HassService): Promise<string> {
+  private async createActionHoverMarkdown(domain: string, serviceName: string, service: ApexService): Promise<string> {
     const actionId = `${domain}.${serviceName}`;
     // Use service.name if available, otherwise use the actionId
     const title = service.name || actionId;
