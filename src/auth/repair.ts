@@ -54,8 +54,8 @@ export async function repairAuthConfiguration(context: vscode.ExtensionContext):
       messages.push("No ApexOS instance URL found. Please set one using 'Manage ApexOS Authentication'.");
       // Prompt to set URL if not found at all
       const newUrl = await vscode.window.showInputBox({
-        prompt: "Enter your ApexOS instance URL (e.g., http://apexos.local:8123)",
-        placeHolder: "http://apexos.local:8123",
+        prompt: "Enter your ApexOS instance URL (e.g., http://apexos.local:1702)",
+        placeHolder: "http://apexos.local:1702",
         ignoreFocusOut: true,
       });
       if (newUrl) {

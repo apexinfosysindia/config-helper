@@ -1,7 +1,7 @@
 /*
 
 This is slightly modified version of
-https://github.com/apexos/home-assistant-js-websocket/blob/master/lib/socket.ts
+https://github.com/apexinfosysindia/js-websocket
 
 */
 

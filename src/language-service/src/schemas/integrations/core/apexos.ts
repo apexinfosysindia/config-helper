@@ -65,13 +65,13 @@ export interface Schema {
   elevation?: Integer;
 
   /**
-   * The URL that ApexOS is available on from the internet. For example: https://example.duckdns.org:8123. Note that this setting may only contain a protocol, hostname and port; using a path is not supported.
+   * The URL that ApexOS is available on from the internet. For example: https://example.duckdns.org:1702. Note that this setting may only contain a protocol, hostname and port; using a path is not supported.
    * https://docs.apexinfosys.in/docs/configuration/basic/#external_url
    */
   external_url?: string;
 
   /**
-   * The URL that ApexOS is available on from your local network. For example: http://apexos.local:8123. Note that this setting may only contain a protocol, hostname and port; using a path is not supported.
+   * The URL that ApexOS is available on from your local network. For example: http://apexos.local:1702. Note that this setting may only contain a protocol, hostname and port; using a path is not supported.
    * https://docs.apexinfosys.in/docs/configuration/basic/#internal_url
    */
   internal_url?: string;

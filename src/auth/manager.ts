@@ -224,7 +224,7 @@ export class AuthManager {
     if (!hostUrl) {
       hostUrl = await vscode.window.showInputBox({
         prompt: "Enter your ApexOS instance URL",
-        placeHolder: "http://apexos.local:8123",
+        placeHolder: "http://apexos.local:1702",
         validateInput: (input) => {
           // Basic URL validation
           try {
@@ -239,7 +239,7 @@ export class AuthManager {
             
             return null; // Valid input
           } catch {
-            return "Please enter a valid URL (e.g., http://apexos.local:8123)";
+            return "Please enter a valid URL (e.g., http://apexos.local:1702)";
           }
         }
       });

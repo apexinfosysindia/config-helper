@@ -62,8 +62,8 @@ async function setToken(context: vscode.ExtensionContext): Promise<void> {
   // Always ask for the instance URL for verification
   instanceUrl = await vscode.window.showInputBox({
     prompt: "Enter your ApexOS instance URL",
-    placeHolder: "http://apexos.local:8123",
-    value: currentUrl || "http://apexos.local:8123", // Pre-fill default if currentUrl is empty
+    placeHolder: "http://apexos.local:1702",
+    value: currentUrl || "http://apexos.local:1702", // Pre-fill default if currentUrl is empty
     validateInput: (input) => {
       // Basic URL validation
       try {
@@ -78,7 +78,7 @@ async function setToken(context: vscode.ExtensionContext): Promise<void> {
         
         return null; // Valid input
       } catch {
-        return "Please enter a valid URL (e.g., http://apexos.local:8123)";
+        return "Please enter a valid URL (e.g., http://apexos.local:1702)";
       }
     }
   });
@@ -284,8 +284,8 @@ async function setInstanceUrl(context: vscode.ExtensionContext): Promise<void> {
   
   const newUrl = await vscode.window.showInputBox({
     prompt: "Enter your ApexOS instance URL",
-    placeHolder: "http://apexos.local:8123",
-    value: currentUrl || "http://apexos.local:8123", // Pre-fill default if currentUrl is empty
+    placeHolder: "http://apexos.local:1702",
+    value: currentUrl || "http://apexos.local:1702", // Pre-fill default if currentUrl is empty
     validateInput: (input) => {
       // Basic URL validation
       try {
@@ -300,7 +300,7 @@ async function setInstanceUrl(context: vscode.ExtensionContext): Promise<void> {
         
         return null; // Valid input
       } catch {
-        return "Please enter a valid URL (e.g., http://apexos.local:8123)";
+        return "Please enter a valid URL (e.g., http://apexos.local:1702)";
       }
     }
   });
