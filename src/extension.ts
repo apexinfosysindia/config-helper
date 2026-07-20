@@ -221,34 +221,34 @@ export async function activate(
     })
   );
 
-  let haOutputChannel: vscode.OutputChannel;
+  let apexOutputChannel: vscode.OutputChannel;
   context.subscriptions.push(
     client.onNotification("get_eror_log_completed", (result) => {
-      if (!haOutputChannel) {
-        haOutputChannel = vscode.window.createOutputChannel(
+      if (!apexOutputChannel) {
+        apexOutputChannel = vscode.window.createOutputChannel(
           "ApexOS Error Log",
         );
         // Register the output channel for disposal to prevent memory leaks
-        context.subscriptions.push(haOutputChannel);
+        context.subscriptions.push(apexOutputChannel);
       }
-      haOutputChannel.appendLine(result);
-      haOutputChannel.show();
+      apexOutputChannel.appendLine(result);
+      apexOutputChannel.show();
     })
   );
 
-  let haTemplateRendererChannel: vscode.OutputChannel;
+  let apexTemplateRendererChannel: vscode.OutputChannel;
   context.subscriptions.push(
     client.onNotification("render_template_completed", (result) => {
-      if (!haTemplateRendererChannel) {
-        haTemplateRendererChannel = vscode.window.createOutputChannel(
+      if (!apexTemplateRendererChannel) {
+        apexTemplateRendererChannel = vscode.window.createOutputChannel(
           "ApexOS Template Renderer",
         );
         // Register the output channel for disposal to prevent memory leaks
-        context.subscriptions.push(haTemplateRendererChannel);
+        context.subscriptions.push(apexTemplateRendererChannel);
       }
-      haTemplateRendererChannel.clear();
-      haTemplateRendererChannel.appendLine(result);
-      haTemplateRendererChannel.show();
+      apexTemplateRendererChannel.clear();
+      apexTemplateRendererChannel.appendLine(result);
+      apexTemplateRendererChannel.show();
     })
   );
 
@@ -537,11 +537,11 @@ export async function activate(
   // Listen for configuration changes that might affect the connection
   context.subscriptions.push(
     vscode.workspace.onDidChangeConfiguration(async (event) => {
-      const haConfigChanged =
+      const apexConfigChanged =
         event.affectsConfiguration("apexos") ||
         event.affectsConfiguration("vscode-home-assistant");
       
-      if (haConfigChanged) {
+      if (apexConfigChanged) {
         console.log("ApexOS configuration changed, updating status bar");
         statusBar.checkConnectionStatus();
       }
@@ -615,7 +615,7 @@ async function isApexOSWorkspace(): Promise<boolean> {
         }
         
         // Additional checks for other ApexOS-specific indicators
-        const haIndicators = [
+        const apexIndicators = [
           "apexos_v2.db",      // ApexOS database
           "apexos.log",        // Log file
           ".APEX_VERSION",     // Version file
@@ -629,7 +629,7 @@ async function isApexOSWorkspace(): Promise<boolean> {
           "ui-lovelace.yaml"           // Dashboard configuration
         ];
         
-        for (const indicator of haIndicators) {
+        for (const indicator of apexIndicators) {
           const indicatorPath = path.join(workspacePath, indicator);
           const indicatorExists = await vscode.workspace.fs.stat(vscode.Uri.file(indicatorPath))
             .then(() => true, () => false);

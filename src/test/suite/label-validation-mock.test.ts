@@ -1,11 +1,11 @@
 import * as assert from "assert";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { CompletionItem, CompletionItemKind, MarkupContent } from "vscode-languageserver-protocol";
-import { IHaConnection } from "../../language-service/src/apexos/haConnection";
-import { ApexOSLanguageService } from "../../language-service/src/haLanguageService";
+import { IApexConnection } from "../../language-service/src/apexos/apexConnection";
+import { ApexOSLanguageService } from "../../language-service/src/apexLanguageService";
 import { getLanguageService } from "yaml-language-server/out/server/src/languageservice/yamlLanguageService";
 import { SchemaServiceForIncludes } from "../../language-service/src/schemas/schemaService";
-import { ApexOSConfiguration } from "../../language-service/src/haConfig/haConfig";
+import { ApexOSConfiguration } from "../../language-service/src/apexConfig/apexConfig";
 
 class MockFileAccessor {
   async getFileContents(_uri: string): Promise<string> {
@@ -26,7 +26,7 @@ class MockFileAccessor {
 }
 
 // Mock ApexOS connection with predefined labels
-class MockHaConnection implements IHaConnection {
+class MockHaConnection implements IApexConnection {
   private mockLabelCompletions: CompletionItem[] = [
     {
       label: "security",
@@ -96,19 +96,19 @@ class MockHaConnection implements IHaConnection {
     return []; 
   }
   
-  async getHassEntities(): Promise<any> {
+  async getApexEntities(): Promise<any> {
     return {};
   }
 
-  async getHassDevices(): Promise<any> {
+  async getApexDevices(): Promise<any> {
     return {};
   }
 
-  async getHassEntityRegistry(): Promise<any> {
+  async getApexEntityRegistry(): Promise<any> {
     return {};
   }
 
-  async getHassServices(): Promise<any> {
+  async getApexServices(): Promise<any> {
     return {};
   }
 
@@ -125,7 +125,7 @@ suite("Label Validation Tests", () => {
     mockConnection = new MockHaConnection();
     
     const fileAccessor = new MockFileAccessor();
-    const haConfig = new ApexOSConfiguration(fileAccessor as any);
+    const apexConfig = new ApexOSConfiguration(fileAccessor as any);
     const yamlLanguageService = getLanguageService({
       schemaRequestService: async () => "",
       workspaceContext: null,
@@ -135,7 +135,7 @@ suite("Label Validation Tests", () => {
     // Create language service with mock connection
     languageService = new ApexOSLanguageService(
       yamlLanguageService,
-      haConfig,
+      apexConfig,
       mockConnection as any, // Type assertion to bypass strict typing
       [],
       await SchemaServiceForIncludes.create(),

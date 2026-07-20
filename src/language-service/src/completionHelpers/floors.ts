@@ -4,12 +4,12 @@ import {
   JSONPath,
   CompletionsCollector,
 } from "vscode-json-languageservice";
-import { IHaConnection } from "../apexos/haConnection";
+import { IApexConnection } from "../apexos/apexConnection";
 
 export class FloorCompletionContribution implements JSONWorkerContribution {
   public static propertyMatches: string[] = ["floor_id", "floor"];
 
-  constructor(private haConnection: IHaConnection) {}
+  constructor(private apexConnection: IApexConnection) {}
 
   public collectDefaultCompletions(
     _resource: string,
@@ -40,7 +40,7 @@ export class FloorCompletionContribution implements JSONWorkerContribution {
     ) {
       return;
     }
-    const floorCompletions = await this.haConnection.getFloorCompletions();
+    const floorCompletions = await this.apexConnection.getFloorCompletions();
     floorCompletions.forEach((c) => {
       if (c.insertText === undefined) {
         c.insertText = c.label;
@@ -61,7 +61,7 @@ export class FloorCompletionContribution implements JSONWorkerContribution {
       return;
     }
 
-    const floorCompletions = await this.haConnection.getFloorCompletions();
+    const floorCompletions = await this.apexConnection.getFloorCompletions();
     floorCompletions.forEach((c) => {
       if (c.insertText === undefined) {
         c.insertText = c.label;

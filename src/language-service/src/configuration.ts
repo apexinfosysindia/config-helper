@@ -121,24 +121,24 @@ export class ConfigurationService implements IConfigurationService {
   };
 
   private setConfigViaEnvironmentVariables() {
-    const envHassServer = (process.env.APEX_SERVER || process.env.HASS_SERVER);
-    const envHassToken = (process.env.APEX_TOKEN || process.env.HASS_TOKEN);
+    const envApexServer = (process.env.APEX_SERVER || process.env.HASS_SERVER);
+    const envApexToken = (process.env.APEX_TOKEN || process.env.HASS_TOKEN);
     const envSupervisorToken = process.env.SUPERVISOR_TOKEN;
     
     console.log("Checking environment variables for configuration:");
-    console.log(`- APEX_SERVER/HASS_SERVER: ${envHassServer ? "Present" : "Not present"}`);
-    console.log(`- APEX_TOKEN/HASS_TOKEN: ${envHassToken ? "Present" : "Not present"}`);
+    console.log(`- APEX_SERVER/HASS_SERVER: ${envApexServer ? "Present" : "Not present"}`);
+    console.log(`- APEX_TOKEN/HASS_TOKEN: ${envApexToken ? "Present" : "Not present"}`);
     console.log(`- SUPERVISOR_TOKEN: ${envSupervisorToken ? "Present" : "Not present"}`);
     
     // Set URL from environment if needed
-    if (!this.url && envHassServer) {
-      this.url = this.getUri(envHassServer);
+    if (!this.url && envApexServer) {
+      this.url = this.getUri(envApexServer);
       console.log(`Using URL from APEX_SERVER/HASS_SERVER env var: ${this.url}`);
     }
     
     // Set token from environment if needed
-    if (!this.token && envHassToken) {
-      this.token = envHassToken;
+    if (!this.token && envApexToken) {
+      this.token = envApexToken;
       console.log(`Using token from APEX_TOKEN/HASS_TOKEN env var (length: ${this.token.length})`);
     }
     

@@ -5,13 +5,13 @@ import {
   CompletionsCollector,
   Thenable,
 } from "vscode-json-languageservice";
-import { IHaConnection } from "../apexos/haConnection";
+import { IApexConnection } from "../apexos/apexConnection";
 import { ApexService } from "@apexinfosysindia/js-websocket";
 
 export class ServicesCompletionContribution implements JSONWorkerContribution {
   public static propertyMatches: string[] = ["service", "action"];
 
-  constructor(private haConnection: IHaConnection) {}
+  constructor(private apexConnection: IApexConnection) {}
 
   public collectDefaultCompletions(
     _resource: string,
@@ -40,7 +40,7 @@ export class ServicesCompletionContribution implements JSONWorkerContribution {
     ) {
       return;
     }
-    const actionsCompletions = await this.haConnection.getServiceCompletions();
+    const actionsCompletions = await this.apexConnection.getServiceCompletions();
     actionsCompletions.forEach((c) => {
       if (c.insertText === undefined) {
         c.insertText = c.label;
@@ -62,7 +62,7 @@ export class ServicesCompletionContribution implements JSONWorkerContribution {
     ) {
       return;
     }
-    const actionsCompletions = await this.haConnection.getServiceCompletions();
+    const actionsCompletions = await this.apexConnection.getServiceCompletions();
     actionsCompletions.forEach((c) => {
       if (c.insertText === undefined) {
         c.insertText = c.label;
@@ -89,7 +89,7 @@ export class ServicesCompletionContribution implements JSONWorkerContribution {
       }
 
       // Get all actions from ApexOS
-      const services = await this.haConnection.getHassServices();
+      const services = await this.apexConnection.getApexServices();
       if (!services) {
         return [];
       }

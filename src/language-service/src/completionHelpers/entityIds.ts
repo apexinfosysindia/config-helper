@@ -4,7 +4,7 @@ import {
   JSONPath,
   CompletionsCollector,
 } from "vscode-json-languageservice";
-import { IHaConnection } from "../apexos/haConnection";
+import { IApexConnection } from "../apexos/apexConnection";
 
 export class EntityIdCompletionContribution implements JSONWorkerContribution {
   public static propertyMatches: string[] = [
@@ -26,7 +26,7 @@ export class EntityIdCompletionContribution implements JSONWorkerContribution {
     "group_members",
   ];
 
-  constructor(private haConnection: IHaConnection) {}
+  constructor(private apexConnection: IApexConnection) {}
 
   public collectDefaultCompletions(
     _resource: string,
@@ -57,7 +57,7 @@ export class EntityIdCompletionContribution implements JSONWorkerContribution {
     ) {
       return;
     }
-    const entityIdCompletions = await this.haConnection.getEntityCompletions();
+    const entityIdCompletions = await this.apexConnection.getEntityCompletions();
     entityIdCompletions.forEach((c) => {
       if (c.insertText === undefined) {
         c.insertText = c.label;
@@ -80,7 +80,7 @@ export class EntityIdCompletionContribution implements JSONWorkerContribution {
       return;
     }
 
-    const entityIdCompletions = await this.haConnection.getEntityCompletions();
+    const entityIdCompletions = await this.apexConnection.getEntityCompletions();
     entityIdCompletions.forEach((c) => {
       if (c.insertText === undefined) {
         c.insertText = c.label;
@@ -107,7 +107,7 @@ export class EntityIdCompletionContribution implements JSONWorkerContribution {
       }
 
       // Get all entities from ApexOS
-      const entities = await this.haConnection.getHassEntities();
+      const entities = await this.apexConnection.getApexEntities();
       if (!entities) {
         return [];
       }
@@ -289,7 +289,7 @@ export class EntityIdCompletionContribution implements JSONWorkerContribution {
     }
 
     try {
-      const areaCompletions = await this.haConnection.getAreaCompletions();
+      const areaCompletions = await this.apexConnection.getAreaCompletions();
       const area = areaCompletions.find(a => a.label === areaId);
       return area?.detail || areaId;
     } catch (error) {
@@ -305,7 +305,7 @@ export class EntityIdCompletionContribution implements JSONWorkerContribution {
 
     try {
       // First get the floor_id from the area
-      const areaCompletions = await this.haConnection.getAreaCompletions();
+      const areaCompletions = await this.apexConnection.getAreaCompletions();
       const area = areaCompletions.find(a => a.label === areaId);
       
       if (!area?.documentation) {
@@ -325,7 +325,7 @@ export class EntityIdCompletionContribution implements JSONWorkerContribution {
       const floorId = floorMatch[1].trim();
       
       // Get human-readable floor name
-      const floorCompletions = await this.haConnection.getFloorCompletions();
+      const floorCompletions = await this.apexConnection.getFloorCompletions();
       const floor = floorCompletions.find(f => f.label === floorId);
       return floor?.detail || floorId;
     } catch (error) {
@@ -341,7 +341,7 @@ export class EntityIdCompletionContribution implements JSONWorkerContribution {
 
     try {
       // Get the entity registry entry to find device_id
-      const entityRegistry = await this.haConnection.getHassEntityRegistry();
+      const entityRegistry = await this.apexConnection.getApexEntityRegistry();
       const entityEntry = entityRegistry[entityId];
       
       if (!entityEntry || !entityEntry.device_id) {
@@ -349,7 +349,7 @@ export class EntityIdCompletionContribution implements JSONWorkerContribution {
       }
 
       // Get the device information
-      const devices = await this.haConnection.getHassDevices();
+      const devices = await this.apexConnection.getApexDevices();
       const device = devices[entityEntry.device_id];
       
       if (!device) {

@@ -24,14 +24,14 @@ import { DeviceCompletionContribution } from "./completionHelpers/deviceIds";
 import { EntityIdCompletionContribution } from "./completionHelpers/entityIds";
 import { FloorCompletionContribution } from "./completionHelpers/floors";
 import { LabelCompletionContribution } from "./completionHelpers/labels";
-import { HaConnection } from "./apexos/haConnection";
+import { ApexConnection } from "./apexos/apexConnection";
 import { ServicesCompletionContribution } from "./completionHelpers/services";
 import { DomainCompletionContribution } from "./completionHelpers/domains";
 import { UuidCompletionContribution } from "./completionHelpers/uuids";
 import { SecretsCompletionContribution } from "./completionHelpers/secrets";
 import { DefinitionProvider } from "./definition/definition";
-import { ApexOSConfiguration } from "./haConfig/haConfig";
-import { Includetype } from "./haConfig/dto";
+import { ApexOSConfiguration } from "./apexConfig/apexConfig";
+import { Includetype } from "./apexConfig/dto";
 import { IConfigurationService } from "./configuration";
 
 export class ApexOSLanguageService {
@@ -40,8 +40,8 @@ export class ApexOSLanguageService {
 
   constructor(
     private yamlLanguageService: LanguageService,
-    private haConfig: ApexOSConfiguration,
-    private haConnection: HaConnection,
+    private apexConfig: ApexOSConfiguration,
+    private apexConnection: ApexConnection,
     private definitionProviders: DefinitionProvider[],
     private schemaServiceForIncludes: SchemaServiceForIncludes,
     private sendDiagnostics: (
@@ -116,15 +116,15 @@ export class ApexOSLanguageService {
 
   public findAndApplySchemas = async (): Promise<void> => {
     try {
-      const haFiles = this.haConfig.getAllFiles();
-      if (haFiles && haFiles.length > 0) {
+      const apexFiles = this.apexConfig.getAllFiles();
+      if (apexFiles && apexFiles.length > 0) {
         console.log(
-          `Applying schemas to ${haFiles.length} of your configuration files...`,
+          `Applying schemas to ${apexFiles.length} of your configuration files...`,
         );
       }
 
       // Get schemas and fix circular references before applying
-      const schemas = await this.schemaServiceForIncludes.getSchemaContributions(haFiles);
+      const schemas = await this.schemaServiceForIncludes.getSchemaContributions(apexFiles);
       const fixedSchemas = schemas.map((schemaContribution: any) => ({
         ...schemaContribution,
         schema: schemaContribution.schema ? this.fixCircularRefsInSchema(schemaContribution.schema) : schemaContribution.schema,
@@ -173,12 +173,12 @@ export class ApexOSLanguageService {
     }
 
     this.onDocumentChangeDebounce = setTimeout(async (): Promise<void> => {
-      const singleFileUpdate = await this.haConfig.updateFile(document.uri);
+      const singleFileUpdate = await this.apexConfig.updateFile(document.uri);
       if (singleFileUpdate.isValidYaml && singleFileUpdate.newFilesFound) {
         console.log(
           `Discover all configuration files because ${document.uri} got updated and new files were found...`,
         );
-        await this.haConfig.discoverFiles();
+        await this.apexConfig.discoverFiles();
         await this.findAndApplySchemas();
       }
 
@@ -318,7 +318,7 @@ export class ApexOSLanguageService {
     
     try {
       // Get all entities from ApexOS
-      const entities = await this.haConnection.getHassEntities();
+      const entities = await this.apexConnection.getApexEntities();
       if (!entities) {
         // If we can't get entities (e.g., not connected), don't validate
         console.log("Entity validation skipped: No entities available from ApexOS");
@@ -511,7 +511,7 @@ export class ApexOSLanguageService {
     
     try {
       // Get all areas from ApexOS
-      const areaCompletions = await this.haConnection.getAreaCompletions();
+      const areaCompletions = await this.apexConnection.getAreaCompletions();
       if (!areaCompletions || areaCompletions.length === 0) {
         // If we can't get areas (e.g., not connected), don't validate
         console.log("Area validation skipped: No areas available from ApexOS");
@@ -739,7 +739,7 @@ export class ApexOSLanguageService {
     
     try {
       // Get all devices from ApexOS
-      const deviceCompletions = await this.haConnection.getDeviceCompletions();
+      const deviceCompletions = await this.apexConnection.getDeviceCompletions();
       if (!deviceCompletions || deviceCompletions.length === 0) {
         // If we can't get devices (e.g., not connected), don't validate
         console.log("Device validation skipped: No devices available from ApexOS");
@@ -967,7 +967,7 @@ export class ApexOSLanguageService {
     
     try {
       // Get all floors from ApexOS
-      const floorCompletions = await this.haConnection.getFloorCompletions();
+      const floorCompletions = await this.apexConnection.getFloorCompletions();
       if (!floorCompletions || floorCompletions.length === 0) {
         // If we can't get floors (e.g., not connected), don't validate
         console.log("Floor validation skipped: No floors available from ApexOS");
@@ -1195,7 +1195,7 @@ export class ApexOSLanguageService {
     
     try {
       // Get all available secrets from secrets.yaml file
-      const fileAccessor = this.haConfig.getFileAccessor();
+      const fileAccessor = this.apexConfig.getFileAccessor();
       const secretsHelper = new SecretsCompletionContribution(fileAccessor);
       const availableSecrets = await secretsHelper.getAvailableSecrets();
       
@@ -1318,7 +1318,7 @@ export class ApexOSLanguageService {
     
     try {
       // Get all labels from ApexOS
-      const labelCompletions = await this.haConnection.getLabelCompletions();
+      const labelCompletions = await this.apexConnection.getLabelCompletions();
       if (!labelCompletions || labelCompletions.length === 0) {
         // If we can't get labels (e.g., not connected), don't validate
         console.log("Label validation skipped: No labels available from ApexOS");
@@ -1561,7 +1561,7 @@ export class ApexOSLanguageService {
     
     try {
       // Get all services from ApexOS
-      const services = await this.haConnection.getHassServices();
+      const services = await this.apexConnection.getApexServices();
       if (!services) {
         // If we can't get actions (e.g., not connected), don't validate
         console.log("Action validation skipped: No actions available from ApexOS");
@@ -1866,7 +1866,7 @@ export class ApexOSLanguageService {
     // Lazy-load entity documentation on-demand to avoid performance issues
     // when there are hundreds/thousands of entities
     if (completionItem.data?.isEntity && completionItem.data?.entityId) {
-      const documentation = await this.haConnection.resolveEntityCompletionDocumentation(
+      const documentation = await this.apexConnection.resolveEntityCompletionDocumentation(
         completionItem.data.entityId
       );
       if (documentation) {
@@ -2074,7 +2074,7 @@ export class ApexOSLanguageService {
       const location = [word];
       
       // Use EntityIdCompletionContribution to get hover info
-      const entityContribution = new EntityIdCompletionContribution(this.haConnection);
+      const entityContribution = new EntityIdCompletionContribution(this.apexConnection);
       const markedStrings = await entityContribution.getInfoContribution(
         document.uri,
         location
@@ -2133,7 +2133,7 @@ export class ApexOSLanguageService {
       const location = [word];
       
       // Use ServicesCompletionContribution to get hover info
-      const servicesContribution = new ServicesCompletionContribution(this.haConnection);
+      const servicesContribution = new ServicesCompletionContribution(this.apexConnection);
       const markedStrings = await servicesContribution.getInfoContribution(
         document.uri,
         location
@@ -2247,11 +2247,11 @@ export class ApexOSLanguageService {
       }
       
       // Use the existing ApexOS connection to render the template
-      if (!this.haConnection) {
+      if (!this.apexConnection) {
         return null;
       }
       
-      const result = await this.haConnection.callApi("post", "template", {
+      const result = await this.apexConnection.callApi("post", "template", {
         template: template,
         strict: true,
       });
@@ -2642,7 +2642,7 @@ export class ApexOSLanguageService {
     }
 
     // We're positioned after !secret, provide secret completions
-    const fileAccessor = this.haConfig.getFileAccessor();
+    const fileAccessor = this.apexConfig.getFileAccessor();
     const secretsHelper = new SecretsCompletionContribution(fileAccessor);
     
     try {
@@ -2689,37 +2689,37 @@ export class ApexOSLanguageService {
     switch (additionalCompletionProvider) {
       case "areas":
         if (!currentCompletions.items.some((x) => x.data && x.data.isArea)) {
-          additionalCompletion = await this.haConnection.getAreaCompletions();
+          additionalCompletion = await this.apexConnection.getAreaCompletions();
         }
         break;
       case "entities":
         // sometimes the entities are already added, do not add them twice
 
         if (!currentCompletions.items.some((x) => x.data && x.data.isEntity)) {
-          additionalCompletion = await this.haConnection.getEntityCompletions();
+          additionalCompletion = await this.apexConnection.getEntityCompletions();
         }
         break;
       case "domains":
         // sometimes the domains are already added, do not add them twice
 
         if (!currentCompletions.items.some((x) => x.data && x.data.isDomain)) {
-          additionalCompletion = await this.haConnection.getDomainCompletions();
+          additionalCompletion = await this.apexConnection.getDomainCompletions();
         }
         break;
       case "floors":
         if (!currentCompletions.items.some((x) => x.data && x.data.isFloor)) {
-          additionalCompletion = await this.haConnection.getFloorCompletions();
+          additionalCompletion = await this.apexConnection.getFloorCompletions();
         }
         break;
       case "labels":
         if (!currentCompletions.items.some((x) => x.data && x.data.isLabel)) {
-          additionalCompletion = await this.haConnection.getLabelCompletions();
+          additionalCompletion = await this.apexConnection.getLabelCompletions();
         }
         break;
       case "services":
         if (!currentCompletions.items.some((x) => x.data && x.data.isService)) {
           additionalCompletion =
-            await this.haConnection.getServiceCompletions();
+            await this.apexConnection.getServiceCompletions();
         }
         break;
       case "uuids":

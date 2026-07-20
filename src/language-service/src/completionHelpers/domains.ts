@@ -4,7 +4,7 @@ import {
   JSONPath,
   CompletionsCollector,
 } from "vscode-json-languageservice";
-import { IHaConnection } from "../apexos/haConnection";
+import { IApexConnection } from "../apexos/apexConnection";
 
 export class DomainCompletionContribution implements JSONWorkerContribution {
   public static propertyMatches: string[] = [
@@ -15,7 +15,7 @@ export class DomainCompletionContribution implements JSONWorkerContribution {
     "domains",
   ];
 
-  constructor(private haConnection: IHaConnection) {}
+  constructor(private apexConnection: IApexConnection) {}
 
   public collectDefaultCompletions(
     _resource: string,
@@ -46,7 +46,7 @@ export class DomainCompletionContribution implements JSONWorkerContribution {
     ) {
       return;
     }
-    const domainCompletions = await this.haConnection.getDomainCompletions();
+    const domainCompletions = await this.apexConnection.getDomainCompletions();
     domainCompletions.forEach((c) => {
       if (c.insertText === undefined) {
         c.insertText = c.label;
@@ -69,7 +69,7 @@ export class DomainCompletionContribution implements JSONWorkerContribution {
       return;
     }
 
-    const domainCompletions = await this.haConnection.getEntityCompletions();
+    const domainCompletions = await this.apexConnection.getEntityCompletions();
     domainCompletions.forEach((c) => {
       if (c.insertText === undefined) {
         c.insertText = c.label;

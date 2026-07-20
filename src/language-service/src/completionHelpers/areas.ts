@@ -4,12 +4,12 @@ import {
   JSONPath,
   CompletionsCollector,
 } from "vscode-json-languageservice";
-import { IHaConnection } from "../apexos/haConnection";
+import { IApexConnection } from "../apexos/apexConnection";
 
 export class AreaCompletionContribution implements JSONWorkerContribution {
   public static propertyMatches: string[] = ["area_id", "area"];
 
-  constructor(private haConnection: IHaConnection) {}
+  constructor(private apexConnection: IApexConnection) {}
 
   public collectDefaultCompletions(
     _resource: string,
@@ -40,7 +40,7 @@ export class AreaCompletionContribution implements JSONWorkerContribution {
     ) {
       return;
     }
-    const areaCompletions = await this.haConnection.getAreaCompletions();
+    const areaCompletions = await this.apexConnection.getAreaCompletions();
     areaCompletions.forEach((c) => {
       if (c.insertText === undefined) {
         c.insertText = c.label;
@@ -61,7 +61,7 @@ export class AreaCompletionContribution implements JSONWorkerContribution {
       return;
     }
 
-    const areaCompletions = await this.haConnection.getAreaCompletions();
+    const areaCompletions = await this.apexConnection.getAreaCompletions();
     areaCompletions.forEach((c) => {
       if (c.insertText === undefined) {
         c.insertText = c.label;

@@ -2,8 +2,8 @@
   "name": "apexos-language-service",
   "version": "2.2.0",
   "description": "ApexOS Language Service",
-  "source": "src/haLanguageService.ts",
-  "main": "dist/haLanguageService.js",
+  "source": "src/apexLanguageService.ts",
+  "main": "dist/apexLanguageService.js",
   "files": [
     "dist"
   ],

@@ -1,7 +1,7 @@
 import * as path from "path";
 import { FileAccessor } from "../fileAccessor";
-import { ApexOSYamlFile } from "./haYamlFile";
-import { ScriptReferences, HaFileInfo, IncludeReferences } from "./dto";
+import { ApexOSYamlFile } from "./apexYamlFile";
+import { ScriptReferences, ApexFileInfo, IncludeReferences } from "./dto";
 
 export class ApexOSConfiguration {
   private files: FilesCollection;
@@ -16,14 +16,14 @@ export class ApexOSConfiguration {
     return this.fileAccessor;
   }
 
-  public getAllFiles = (): HaFileInfo[] => {
-    const allFiles: HaFileInfo[] = [];
+  public getAllFiles = (): ApexFileInfo[] => {
+    const allFiles: ApexFileInfo[] = [];
 
     for (const [filename, yamlFile] of Object.entries(this.files)) {
       allFiles.push({
         filename,
         path: yamlFile.path,
-      } as HaFileInfo);
+      } as ApexFileInfo);
     }
     return allFiles;
   };

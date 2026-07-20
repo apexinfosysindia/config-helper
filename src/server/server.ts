@@ -8,10 +8,10 @@ import {
 } from "vscode-languageserver/node";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { getLanguageService } from "yaml-language-server/out/server/src/languageservice/yamlLanguageService";
-import { HaConnection } from "../language-service/src/apexos/haConnection";
+import { ApexConnection } from "../language-service/src/apexos/apexConnection";
 import { ConfigurationService } from "../language-service/src/configuration";
-import { ApexOSConfiguration } from "../language-service/src/haConfig/haConfig";
-import { ApexOSLanguageService } from "../language-service/src/haLanguageService";
+import { ApexOSConfiguration } from "../language-service/src/apexConfig/apexConfig";
+import { ApexOSLanguageService } from "../language-service/src/apexLanguageService";
 import { SchemaServiceForIncludes } from "../language-service/src/schemas/schemaService";
 import { IncludeDefinitionProvider } from "../language-service/src/definition/includes";
 import { ScriptDefinitionProvider } from "../language-service/src/definition/scripts";
@@ -33,16 +33,16 @@ connection.onInitialize(async (params) => {
   );
 
   // Check if initialization contains the token in custom data
-  const haConfig =
+  const apexConfig =
     params.initializationOptions &&
     (params.initializationOptions["apexos"] ||
       // Legacy-compat: pre-fork clients send the old section name
       params.initializationOptions["vscode-home-assistant"]);
   
-  if (haConfig) {
+  if (apexConfig) {
     // Extract token
-    if (haConfig.longLivedAccessToken) {
-      const token = haConfig.longLivedAccessToken;
+    if (apexConfig.longLivedAccessToken) {
+      const token = apexConfig.longLivedAccessToken;
       console.log(`Token provided in initialization options (length: ${token.length}, first 5 chars: ${token.substring(0, 5)}...)`);
       process.env.APEX_TOKEN = token; // Set as environment variable for backup
     } else {
@@ -50,9 +50,9 @@ connection.onInitialize(async (params) => {
     }
     
     // Extract ApexOS instance URL
-    if (haConfig.hostUrl) {
-      console.log(`ApexOS instance URL provided in initialization options: ${haConfig.hostUrl}`);
-      process.env.APEX_SERVER = haConfig.hostUrl;
+    if (apexConfig.hostUrl) {
+      console.log(`ApexOS instance URL provided in initialization options: ${apexConfig.hostUrl}`);
+      process.env.APEX_SERVER = apexConfig.hostUrl;
     } else {
       console.log("No ApexOS instance URL provided in initialization options");
     }
@@ -61,13 +61,13 @@ connection.onInitialize(async (params) => {
   }
 
   const configurationService = new ConfigurationService();
-  const haConnection = new HaConnection(configurationService);
+  const apexConnection = new ApexConnection(configurationService);
   const fileAccessor = new VsCodeFileAccessor(params.rootUri, documents);
-  const haConfigInstance = new ApexOSConfiguration(fileAccessor);
+  const apexConfigInstance = new ApexOSConfiguration(fileAccessor);
 
   const definitionProviders = [
     new IncludeDefinitionProvider(fileAccessor),
-    new ScriptDefinitionProvider(haConfigInstance),
+    new ScriptDefinitionProvider(apexConfigInstance),
     new SecretsDefinitionProvider(fileAccessor),
   ];
 
@@ -87,7 +87,7 @@ connection.onInitialize(async (params) => {
   const discoverFilesAndUpdateSchemas = async () => {
     try {
       console.log("Discovering files and updating schemas...");
-      await haConfigInstance.discoverFiles();
+      await apexConfigInstance.discoverFiles();
       await homeAsisstantLanguageService.findAndApplySchemas();
       console.log("Files discovered and schemas updated successfully");
     } catch (e) {
@@ -99,8 +99,8 @@ connection.onInitialize(async (params) => {
 
   const homeAsisstantLanguageService = new ApexOSLanguageService(
     yamlLanguageService,
-    haConfigInstance,
-    haConnection,
+    apexConfigInstance,
+    apexConnection,
     definitionProviders,
     await SchemaServiceForIncludes.create(),
     sendDiagnostics,
@@ -115,12 +115,12 @@ connection.onInitialize(async (params) => {
   );
 
   // Setup handlers to notify client about connection status
-  haConnection.onConnectionEstablished = (info) => {
+  apexConnection.onConnectionEstablished = (info) => {
     console.log("ApexOS connection established, notifying client");
     connection.sendNotification("ha_connected", info);
   };
   
-  haConnection.onConnectionFailed = (error) => {
+  apexConnection.onConnectionFailed = (error) => {
     console.log("ApexOS connection failed, notifying client");
     connection.sendNotification("ha_connection_error", { error: error || "Unknown error" });
   };
@@ -133,7 +133,7 @@ connection.onInitialize(async (params) => {
   );
   documents.onDidClose((e) => {
     // Remove closed documents from file collection to prevent memory leaks
-    haConfigInstance.removeFile(e.document.uri);
+    apexConfigInstance.removeFile(e.document.uri);
   });
 
   let onDidSaveDebounce: NodeJS.Timeout;
@@ -198,17 +198,17 @@ connection.onInitialize(async (params) => {
     console.log("Received configuration change from VS Code");
     
     // Check for token in incoming configuration before applying changes
-    const haConfig = config.settings && config.settings["apexos"];
-    if (haConfig) {
-      if (haConfig.longLivedAccessToken) {
-        const token = haConfig.longLivedAccessToken;
+    const apexConfig = config.settings && config.settings["apexos"];
+    if (apexConfig) {
+      if (apexConfig.longLivedAccessToken) {
+        const token = apexConfig.longLivedAccessToken;
         console.log(`Token received in configuration update (length: ${token.length}, first 5 chars: ${token.substring(0, 5)}...)`);
       } else {
         console.log("No token in configuration update");
       }
       
-      if (haConfig.hostUrl) {
-        console.log(`ApexOS instance URL in configuration update: ${haConfig.hostUrl}`);
+      if (apexConfig.hostUrl) {
+        console.log(`ApexOS instance URL in configuration update: ${apexConfig.hostUrl}`);
       } else {
         console.log("No ApexOS instance URL in configuration update");
       }
@@ -220,7 +220,7 @@ connection.onInitialize(async (params) => {
     configurationService.updateConfiguration(config);
     
     // Notify connection handler to update connection if needed
-    await haConnection.notifyConfigUpdate();
+    await apexConnection.notifyConfigUpdate();
 
     // Check configuration status after update
     if (!configurationService.isConfigured) {
@@ -234,7 +234,7 @@ connection.onInitialize(async (params) => {
   connection.onRequest(
     "callService",
     (args: { domain: string; service: string; serviceData?: any }) => {
-      void haConnection.callService(
+      void apexConnection.callService(
         args.domain,
         args.service,
         args.serviceData,
@@ -243,14 +243,14 @@ connection.onInitialize(async (params) => {
   );
 
   connection.onRequest("checkConfig", async (_) => {
-    const result = await haConnection.callApi(
+    const result = await apexConnection.callApi(
       "post",
       "config/core/check_config",
     );
     connection.sendNotification("configuration_check_completed", result);
   });
   connection.onRequest("getErrorLog", async (_) => {
-    const result = await haConnection.callApi("get", "error_log");
+    const result = await apexConnection.callApi("get", "error_log");
     connection.sendNotification("get_eror_log_completed", result);
   });
   connection.onRequest("renderTemplate", async (args: { template: string }) => {
@@ -258,7 +258,7 @@ connection.onInitialize(async (params) => {
     let outputString = `${timePrefix}Rendering template:\n${args.template}\n\n`;
     
     try {
-      const result = await haConnection.callApi("post", "template", {
+      const result = await apexConnection.callApi("post", "template", {
         template: args.template,
         strict: true,
       });

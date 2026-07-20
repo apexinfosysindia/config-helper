@@ -9,15 +9,15 @@ import {
   type ApexEntities,
   type ApexServices,
   type AuthData,
-  createConnection as haCreateConnection,
-  Auth as HaAuth,
+  createConnection as apexCreateConnection,
+  Auth as ApexAuth,
   subscribeEntities,
   subscribeServices,
 } from "@apexinfosysindia/js-websocket";
 import { IConfigurationService } from "../configuration";
 import { createSocket } from "./socket";
 
-export interface HassArea {
+export interface ApexArea {
   area_id: string;
   floor_id: string | null;
   name: string;
@@ -27,11 +27,11 @@ export interface HassArea {
   aliases: string[];
 }
 
-export interface HassAreas {
-  [area_id: string]: HassArea;
+export interface ApexAreas {
+  [area_id: string]: ApexArea;
 }
 
-export interface HassFloor {
+export interface ApexFloor {
   floor_id: string;
   name: string;
   level: number | null;
@@ -39,11 +39,11 @@ export interface HassFloor {
   aliases: string[];
 }
 
-export interface HassFloors {
-  [floor_id: string]: HassFloor;
+export interface ApexFloors {
+  [floor_id: string]: ApexFloor;
 }
 
-export interface HassLabel {
+export interface ApexLabel {
   label_id: string;
   name: string;
   icon: string | null;
@@ -51,7 +51,7 @@ export interface HassLabel {
   description: string | null;
 }
 
-export interface HassDevice {
+export interface ApexDevice {
   area_id: string | null;
   configuration_url: string | null;
   config_entries: string[];
@@ -70,15 +70,15 @@ export interface HassDevice {
   labels: string[];
 }
 
-export interface HassDevices {
-  [device_id: string]: HassDevice;
+export interface ApexDevices {
+  [device_id: string]: ApexDevice;
 }
 
-export interface HassLabels {
-  [label_id: string]: HassLabel;
+export interface ApexLabels {
+  [label_id: string]: ApexLabel;
 }
 
-export interface HassEntityRegistryEntry {
+export interface ApexEntityRegistryEntry {
   area_id: string | null;
   config_entry_id: string | null;
   device_id: string | null;
@@ -98,8 +98,8 @@ export interface HassEntityRegistryEntry {
   labels: string[];
 }
 
-export interface HassEntityRegistry {
-  [entity_id: string]: HassEntityRegistryEntry;
+export interface ApexEntityRegistry {
+  [entity_id: string]: ApexEntityRegistryEntry;
 }
 
 // Normal require(), and cast to the static type
@@ -107,7 +107,7 @@ export interface HassEntityRegistry {
 
 // require("@apexinfosysindia/js-websocket/dist/apexws.cjs") as typeof import("@apexinfosysindia/js-websocket");
 
-export interface IHaConnection {
+export interface IApexConnection {
   tryConnect(): Promise<void>;
   notifyConfigUpdate(conf: any): Promise<void>;
   getAreaCompletions(): Promise<CompletionItem[]>;
@@ -117,29 +117,29 @@ export interface IHaConnection {
   getFloorCompletions(): Promise<CompletionItem[]>;
   getLabelCompletions(): Promise<CompletionItem[]>;
   getServiceCompletions(): Promise<CompletionItem[]>;
-  getHassEntities(): Promise<ApexEntities>;
-  getHassDevices(): Promise<HassDevices>;
-  getHassEntityRegistry(): Promise<HassEntityRegistry>;
-  getHassServices(): Promise<ApexServices>;
+  getApexEntities(): Promise<ApexEntities>;
+  getApexDevices(): Promise<ApexDevices>;
+  getApexEntityRegistry(): Promise<ApexEntityRegistry>;
+  getApexServices(): Promise<ApexServices>;
   resolveEntityCompletionDocumentation(entityId: string): Promise<MarkupContent | undefined>;
 }
 
-export class HaConnection implements IHaConnection {
+export class ApexConnection implements IApexConnection {
   private connection: Connection | undefined;
 
-  private hassAreas!: Promise<HassAreas>;
+  private apexAreas!: Promise<ApexAreas>;
 
-  private hassDevices!: Promise<HassDevices>;
+  private apexDevices!: Promise<ApexDevices>;
 
-  private hassEntities!: Promise<ApexEntities>;
+  private apexEntities!: Promise<ApexEntities>;
 
-  private hassEntityRegistry!: Promise<HassEntityRegistry>;
+  private apexEntityRegistry!: Promise<ApexEntityRegistry>;
 
-  private hassFloors!: Promise<HassFloors>;
+  private apexFloors!: Promise<ApexFloors>;
 
-  private hassLabels!: Promise<HassLabels>;
+  private apexLabels!: Promise<ApexLabels>;
 
-  private hassServices!: Promise<ApexServices>;
+  private apexServices!: Promise<ApexServices>;
 
   // Cache the current entities to avoid memory churn from subscription updates
   private currentEntitiesCache: ApexEntities | undefined;
@@ -238,7 +238,7 @@ export class HaConnection implements IHaConnection {
     }
     
     // Create auth object with both HTTP and WebSocket URLs
-    const auth = new HaAuth({
+    const auth = new ApexAuth({
       access_token: this.configurationService.token || "",
       expires: +new Date(new Date().getTime() + 1e11),
       wsUrl: wsUrl,
@@ -265,7 +265,7 @@ export class HaConnection implements IHaConnection {
       console.log("Connecting to ApexOS...");
       console.log(`Using WebSocket URL: ${auth.wsUrl}`);
       
-      this.connection = await haCreateConnection({
+      this.connection = await apexCreateConnection({
         auth,
         createSocket: async () =>
           createSocket(auth, this.configurationService.ignoreCertificates),
@@ -436,13 +436,13 @@ export class HaConnection implements IHaConnection {
 
     // Reset connection state to force full reconnection
     this.connection = undefined;
-    this.hassAreas = undefined as any;
-    this.hassDevices = undefined as any;
-    this.hassEntities = undefined as any;
-    this.hassEntityRegistry = undefined as any;
-    this.hassFloors = undefined as any;
-    this.hassLabels = undefined as any;
-    this.hassServices = undefined as any;
+    this.apexAreas = undefined as any;
+    this.apexDevices = undefined as any;
+    this.apexEntities = undefined as any;
+    this.apexEntityRegistry = undefined as any;
+    this.apexFloors = undefined as any;
+    this.apexLabels = undefined as any;
+    this.apexServices = undefined as any;
 
     // Clear caches to release memory
     this.currentEntitiesCache = undefined;
@@ -504,26 +504,26 @@ export class HaConnection implements IHaConnection {
     }
   };
 
-  private getHassAreas = async (): Promise<HassAreas> => {
-    if (this.hassAreas !== undefined) {
-      return this.hassAreas;
+  private getApexAreas = async (): Promise<ApexAreas> => {
+    if (this.apexAreas !== undefined) {
+      return this.apexAreas;
     }
 
     await this.createConnection();
 
-    this.hassAreas = new Promise<HassAreas>(
+    this.apexAreas = new Promise<ApexAreas>(
       // eslint-disable-next-line no-async-promise-executor
       async (resolve, reject) => {
         if (!this.connection) {
           return reject();
         }
         this.connection
-          ?.sendMessagePromise<HassArea[]>({
+          ?.sendMessagePromise<ApexArea[]>({
             type: "config/area_registry/list",
           })
           .then((areas) => {
             console.log(`Got ${areas.length} areas from ApexOS`);
-            const repacked_areas: HassAreas = {};
+            const repacked_areas: ApexAreas = {};
             areas.forEach((area) => {
               repacked_areas[area.area_id] = area;
             });
@@ -531,11 +531,11 @@ export class HaConnection implements IHaConnection {
           });
       },
     );
-    return this.hassAreas;
+    return this.apexAreas;
   };
 
   public async getAreaCompletions(): Promise<CompletionItem[]> {
-    const areas = await this.getHassAreas();
+    const areas = await this.getApexAreas();
 
     if (!areas) {
       return [];
@@ -568,26 +568,26 @@ export class HaConnection implements IHaConnection {
     return completions;
   }
 
-  private getHassFloors = async (): Promise<HassFloors> => {
-    if (this.hassFloors !== undefined) {
-      return this.hassFloors;
+  private getApexFloors = async (): Promise<ApexFloors> => {
+    if (this.apexFloors !== undefined) {
+      return this.apexFloors;
     }
 
     await this.createConnection();
 
-    this.hassFloors = new Promise<HassFloors>(
+    this.apexFloors = new Promise<ApexFloors>(
       // eslint-disable-next-line no-async-promise-executor
       async (resolve, reject) => {
         if (!this.connection) {
           return reject();
         }
         this.connection
-          ?.sendMessagePromise<HassFloor[]>({
+          ?.sendMessagePromise<ApexFloor[]>({
             type: "config/floor_registry/list",
           })
           .then((floors) => {
             console.log(`Got ${floors.length} floors from ApexOS`);
-            const repacked_floors: HassFloors = {};
+            const repacked_floors: ApexFloors = {};
             floors.forEach((floor) => {
               repacked_floors[floor.floor_id] = floor;
             });
@@ -595,11 +595,11 @@ export class HaConnection implements IHaConnection {
           });
       },
     );
-    return this.hassFloors;
+    return this.apexFloors;
   };
 
   public async getFloorCompletions(): Promise<CompletionItem[]> {
-    const floors = await this.getHassFloors();
+    const floors = await this.getApexFloors();
 
     if (!floors) {
       return [];
@@ -625,26 +625,26 @@ export class HaConnection implements IHaConnection {
     return completions;
   }
 
-  private getHassDevicesInternal = async (): Promise<HassDevices> => {
-    if (this.hassDevices !== undefined) {
-      return this.hassDevices;
+  private getApexDevicesInternal = async (): Promise<ApexDevices> => {
+    if (this.apexDevices !== undefined) {
+      return this.apexDevices;
     }
 
     await this.createConnection();
 
-    this.hassDevices = new Promise<HassDevices>(
+    this.apexDevices = new Promise<ApexDevices>(
       // eslint-disable-next-line no-async-promise-executor
       async (resolve, reject) => {
         if (!this.connection) {
           return reject();
         }
         this.connection
-          ?.sendMessagePromise<HassDevice[]>({
+          ?.sendMessagePromise<ApexDevice[]>({
             type: "config/device_registry/list",
           })
           .then((devices) => {
             console.log(`Got ${devices.length} devices from ApexOS`);
-            const repacked_devices: HassDevices = {};
+            const repacked_devices: ApexDevices = {};
             devices.forEach((device) => {
               repacked_devices[device.id] = device;
             });
@@ -652,15 +652,15 @@ export class HaConnection implements IHaConnection {
           });
       },
     );
-    return this.hassDevices;
+    return this.apexDevices;
   };
 
-  public async getHassDevices(): Promise<HassDevices> {
-    return this.getHassDevicesInternal();
+  public async getApexDevices(): Promise<ApexDevices> {
+    return this.getApexDevicesInternal();
   }
 
   public async getDeviceCompletions(): Promise<CompletionItem[]> {
-    const devices = await this.getHassDevices();
+    const devices = await this.getApexDevices();
 
     if (!devices) {
       return [];
@@ -705,7 +705,7 @@ export class HaConnection implements IHaConnection {
     return completions;
   }
 
-  public async getHassEntities(): Promise<ApexEntities> {
+  public async getApexEntities(): Promise<ApexEntities> {
     // If we have a cached value, return it immediately
     // This is updated in real-time by the subscription callback
     if (this.currentEntitiesCache !== undefined) {
@@ -713,13 +713,13 @@ export class HaConnection implements IHaConnection {
     }
 
     // If we already have a promise waiting for initial load, return it
-    if (this.hassEntities !== undefined) {
-      return this.hassEntities;
+    if (this.apexEntities !== undefined) {
+      return this.apexEntities;
     }
 
     await this.createConnection();
 
-    this.hassEntities = new Promise<ApexEntities>(
+    this.apexEntities = new Promise<ApexEntities>(
       // eslint-disable-next-line no-async-promise-executor
       async (resolve, reject) => {
         if (!this.connection) {
@@ -762,29 +762,29 @@ export class HaConnection implements IHaConnection {
         });
       },
     );
-    return this.hassEntities;
+    return this.apexEntities;
   }
 
-  private getHassEntityRegistryInternal = async (): Promise<HassEntityRegistry> => {
-    if (this.hassEntityRegistry !== undefined) {
-      return this.hassEntityRegistry;
+  private getApexEntityRegistryInternal = async (): Promise<ApexEntityRegistry> => {
+    if (this.apexEntityRegistry !== undefined) {
+      return this.apexEntityRegistry;
     }
 
     await this.createConnection();
 
-    this.hassEntityRegistry = new Promise<HassEntityRegistry>(
+    this.apexEntityRegistry = new Promise<ApexEntityRegistry>(
       // eslint-disable-next-line no-async-promise-executor
       async (resolve, reject) => {
         if (!this.connection) {
           return reject();
         }
         this.connection
-          ?.sendMessagePromise<HassEntityRegistryEntry[]>({
+          ?.sendMessagePromise<ApexEntityRegistryEntry[]>({
             type: "config/entity_registry/list",
           })
           .then((entityEntries) => {
             console.log(`Got ${entityEntries.length} entity registry entries from ApexOS`);
-            const repacked_entities: HassEntityRegistry = {};
+            const repacked_entities: ApexEntityRegistry = {};
             entityEntries.forEach((entry) => {
               repacked_entities[entry.entity_id] = entry;
             });
@@ -792,33 +792,33 @@ export class HaConnection implements IHaConnection {
           });
       },
     );
-    return this.hassEntityRegistry;
+    return this.apexEntityRegistry;
   };
 
-  public async getHassEntityRegistry(): Promise<HassEntityRegistry> {
-    return this.getHassEntityRegistryInternal();
+  public async getApexEntityRegistry(): Promise<ApexEntityRegistry> {
+    return this.getApexEntityRegistryInternal();
   }
 
-  private getHassLabels = async (): Promise<HassLabels> => {
-    if (this.hassLabels !== undefined) {
-      return this.hassLabels;
+  private getApexLabels = async (): Promise<ApexLabels> => {
+    if (this.apexLabels !== undefined) {
+      return this.apexLabels;
     }
 
     await this.createConnection();
 
-    this.hassLabels = new Promise<HassLabels>(
+    this.apexLabels = new Promise<ApexLabels>(
       // eslint-disable-next-line no-async-promise-executor
       async (resolve, reject) => {
         if (!this.connection) {
           return reject();
         }
         this.connection
-          ?.sendMessagePromise<HassLabel[]>({
+          ?.sendMessagePromise<ApexLabel[]>({
             type: "config/label_registry/list",
           })
           .then((labels) => {
             console.log(`Got ${labels.length} labels from ApexOS`);
-            const repacked_labels: HassLabels = {};
+            const repacked_labels: ApexLabels = {};
             labels.forEach((label) => {
               repacked_labels[label.label_id] = label;
             });
@@ -826,11 +826,11 @@ export class HaConnection implements IHaConnection {
           });
       },
     );
-    return this.hassLabels;
+    return this.apexLabels;
   };
 
   public async getLabelCompletions(): Promise<CompletionItem[]> {
-    const labels = await this.getHassLabels();
+    const labels = await this.getApexLabels();
 
     if (!labels) {
       return [];
@@ -914,7 +914,7 @@ export class HaConnection implements IHaConnection {
 
     try {
       // Get the entity registry entry to find device_id
-      const entityRegistry = await this.getHassEntityRegistry();
+      const entityRegistry = await this.getApexEntityRegistry();
       const entityEntry = entityRegistry[entityId];
       
       if (!entityEntry || !entityEntry.device_id) {
@@ -922,7 +922,7 @@ export class HaConnection implements IHaConnection {
       }
 
       // Get the device information
-      const devices = await this.getHassDevices();
+      const devices = await this.getApexDevices();
       const device = devices[entityEntry.device_id];
       
       if (!device) {
@@ -940,7 +940,7 @@ export class HaConnection implements IHaConnection {
   }
 
   public async getEntityCompletions(): Promise<CompletionItem[]> {
-    const entities = await this.getHassEntities();
+    const entities = await this.getApexEntities();
 
     if (!entities) {
       return [];
@@ -1101,7 +1101,7 @@ export class HaConnection implements IHaConnection {
 
   public async resolveEntityCompletionDocumentation(entityId: string): Promise<MarkupContent | undefined> {
     try {
-      const entities = await this.getHassEntities();
+      const entities = await this.getApexEntities();
       if (!entities) {
         return undefined;
       }
@@ -1122,7 +1122,7 @@ export class HaConnection implements IHaConnection {
   }
 
   public async getDomainCompletions(): Promise<CompletionItem[]> {
-    const entities = await this.getHassEntities();
+    const entities = await this.getApexEntities();
     let domains = [];
 
     if (!entities) {
@@ -1145,7 +1145,7 @@ export class HaConnection implements IHaConnection {
     return completions;
   }
 
-  public async getHassServices(): Promise<ApexServices> {
+  public async getApexServices(): Promise<ApexServices> {
     // If we have a cached value, return it immediately
     // This is updated in real-time by the subscription callback
     if (this.currentServicesCache !== undefined) {
@@ -1153,13 +1153,13 @@ export class HaConnection implements IHaConnection {
     }
 
     // If we already have a promise waiting for initial load, return it
-    if (this.hassServices !== undefined) {
-      return this.hassServices;
+    if (this.apexServices !== undefined) {
+      return this.apexServices;
     }
 
     await this.createConnection();
 
-    this.hassServices = new Promise<ApexServices>(
+    this.apexServices = new Promise<ApexServices>(
       // eslint-disable-next-line no-async-promise-executor
       async (resolve, reject) => {
         if (!this.connection) {
@@ -1188,11 +1188,11 @@ export class HaConnection implements IHaConnection {
         });
       },
     );
-    return this.hassServices;
+    return this.apexServices;
   };
 
   public async getServiceCompletions(): Promise<CompletionItem[]> {
-    const services = await this.getHassServices();
+    const services = await this.getApexServices();
 
     if (!services) {
       return [];

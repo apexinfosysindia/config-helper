@@ -1,9 +1,9 @@
 import * as assert from "assert";
-import { ApexOSLanguageService } from "../../language-service/src/haLanguageService";
+import { ApexOSLanguageService } from "../../language-service/src/apexLanguageService";
 import { TextDocument, CompletionItem, CompletionItemKind, MarkupContent } from "vscode-languageserver-protocol";
-import { IHaConnection } from "../../language-service/src/apexos/haConnection";
+import { IApexConnection } from "../../language-service/src/apexos/apexConnection";
 import { ApexServices } from "@apexinfosysindia/js-websocket";
-import { ApexOSConfiguration } from "../../language-service/src/haConfig/haConfig";
+import { ApexOSConfiguration } from "../../language-service/src/apexConfig/apexConfig";
 import { getLanguageService } from "yaml-language-server/out/server/src/languageservice/yamlLanguageService";
 import { SchemaServiceForIncludes } from "../../language-service/src/schemas/schemaService";
 
@@ -15,7 +15,7 @@ class MockFileAccessor {
 }
 
 // Mock ApexOS connection with predefined services
-class MockHaConnection implements IHaConnection {
+class MockHaConnection implements IApexConnection {
   private mockServices: ApexServices = {
     light: {
       turn_on: {
@@ -176,19 +176,19 @@ class MockHaConnection implements IHaConnection {
     return this.mockServiceCompletions; 
   }
 
-  async getHassEntities(): Promise<any> {
+  async getApexEntities(): Promise<any> {
     return {};
   }
 
-  async getHassDevices(): Promise<any> {
+  async getApexDevices(): Promise<any> {
     return {};
   }
 
-  async getHassEntityRegistry(): Promise<any> {
+  async getApexEntityRegistry(): Promise<any> {
     return {};
   }
 
-  async getHassServices(): Promise<ApexServices> {
+  async getApexServices(): Promise<ApexServices> {
     return this.mockServices;
   }
 
@@ -205,7 +205,7 @@ suite("Action Validation Mock Test", () => {
   setup(async () => {
     mockConnection = new MockHaConnection();
     const fileAccessor = new MockFileAccessor();
-    const haConfig = new ApexOSConfiguration(fileAccessor as any);
+    const apexConfig = new ApexOSConfiguration(fileAccessor as any);
     const yamlLanguageService = getLanguageService({
       schemaRequestService: async () => "",
       workspaceContext: null,
@@ -215,7 +215,7 @@ suite("Action Validation Mock Test", () => {
     // Create language service with mock connection
     languageService = new ApexOSLanguageService(
       yamlLanguageService,
-      haConfig,
+      apexConfig,
       mockConnection as any, // Type assertion to bypass strict typing
       [],
       await SchemaServiceForIncludes.create(),

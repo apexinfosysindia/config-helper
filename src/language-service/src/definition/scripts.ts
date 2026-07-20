@@ -1,9 +1,9 @@
 import { Definition, Location } from "vscode-languageserver-protocol";
-import { ApexOSConfiguration } from "../haConfig/haConfig";
+import { ApexOSConfiguration } from "../apexConfig/apexConfig";
 import { DefinitionProvider } from "./definition";
 
 export class ScriptDefinitionProvider implements DefinitionProvider {
-  constructor(private haConfig: ApexOSConfiguration) {}
+  constructor(private apexConfig: ApexOSConfiguration) {}
 
   public onDefinition = async (
     line: string,
@@ -13,7 +13,7 @@ export class ScriptDefinitionProvider implements DefinitionProvider {
     if (!matches || matches.length !== 6) {
       return [];
     }
-    const scripts = await this.haConfig.getScripts();
+    const scripts = await this.apexConfig.getScripts();
     const scriptName = matches[3].replace(":", ""); // might be possible in regex!?
     const ourScript = scripts[scriptName];
     if (!ourScript) {

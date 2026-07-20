@@ -6,7 +6,7 @@ export enum Includetype {
   include_dir_merge_named,
 }
 
-export interface HaFileInfo {
+export interface ApexFileInfo {
   filename: string;
   path: string;
 }

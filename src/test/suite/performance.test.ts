@@ -2,7 +2,7 @@ import * as assert from "assert";
 import * as vscode from "vscode";
 import * as path from "path";
 import * as fs from "fs/promises";
-import { ApexOSYamlFile } from "../../language-service/src/haConfig/haYamlFile";
+import { ApexOSYamlFile } from "../../language-service/src/apexConfig/apexYamlFile";
 import { FileAccessor } from "../../language-service/src/fileAccessor";
 
 // Reuse TestFileAccessor from yaml-position-tracking.test.ts

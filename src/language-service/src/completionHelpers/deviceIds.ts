@@ -3,12 +3,12 @@ import {
   JSONPath,
   CompletionsCollector,
 } from "vscode-json-languageservice";
-import { IHaConnection } from "../apexos/haConnection";
+import { IApexConnection } from "../apexos/apexConnection";
 
 export class DeviceCompletionContribution implements JSONWorkerContribution {
   public static propertyMatches: string[] = ["device_id", "device"];
 
-  constructor(private haConnection: IHaConnection) {}
+  constructor(private apexConnection: IApexConnection) {}
 
   public collectDefaultCompletions(
     _resource: string,
@@ -39,7 +39,7 @@ export class DeviceCompletionContribution implements JSONWorkerContribution {
     ) {
       return;
     }
-    const deviceCompletions = await this.haConnection.getDeviceCompletions();
+    const deviceCompletions = await this.apexConnection.getDeviceCompletions();
     deviceCompletions.forEach((c) => {
       if (c.insertText === undefined) {
         c.insertText = c.label;

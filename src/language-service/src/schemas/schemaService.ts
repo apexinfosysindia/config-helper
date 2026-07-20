@@ -1,7 +1,7 @@
 import * as path from "path";
 import * as fs from "fs/promises";
 import { JSONSchema } from "yaml-language-server/out/server/src/languageservice/jsonSchema";
-import { HaFileInfo } from "../haConfig/dto";
+import { ApexFileInfo } from "../apexConfig/dto";
 
 export class SchemaServiceForIncludes {
   private mappings: (PathToSchemaMapping & { schema: JSONSchema })[];
@@ -28,14 +28,14 @@ export class SchemaServiceForIncludes {
     };
   }
 
-  public async getSchemaContributions(haFiles: HaFileInfo[]): Promise<any> {
+  public async getSchemaContributions(apexFiles: ApexFileInfo[]): Promise<any> {
     const results: {
       uri: string;
       fileMatch?: string[];
       schema?: JSONSchema;
     }[] = [];
 
-    for (const [sourceFile, sourceFileMapping] of haFiles.entries()) {
+    for (const [sourceFile, sourceFileMapping] of apexFiles.entries()) {
       let sourceFileMappingPath = sourceFileMapping.path.replace(
         path.join("apexos", "packages") + path.sep,
         "",
@@ -92,7 +92,7 @@ export class SchemaServiceForIncludes {
       );
       if (relatedPathToSchemaMapping) {
         const id = `http://schemas.docs.apexinfosys.in/${relatedPathToSchemaMapping.key}`;
-        let absolutePath = await fs.realpath(haFiles[sourceFile].filename);
+        let absolutePath = await fs.realpath(apexFiles[sourceFile].filename);
         absolutePath = absolutePath.replace(/\\/g, "/");
         const fileass = encodeURI(absolutePath);
         let resultEntry = results.find((x) => x.uri === id);

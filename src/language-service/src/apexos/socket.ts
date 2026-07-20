@@ -18,7 +18,7 @@ const ERR_INVALID_AUTH = 2;
 // Note: Auth type is extended inline where needed with intersection types
 // This allows us to pass custom properties without modifying the original type
 
-interface HaWebSocket extends WebSocket {
+interface ApexWebSocket extends WebSocket {
   haVersion: string;
 }
 
@@ -51,7 +51,7 @@ export function createSocket(
 
     const socket = new WebSocket(url, {
       rejectUnauthorized: !ignoreCertificates,
-    }) as HaWebSocket;
+    }) as ApexWebSocket;
 
     // If invalid auth, we will not try to reconnect.
     let invalidAuth = false;
