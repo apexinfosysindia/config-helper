@@ -1,0 +1,764 @@
+{
+  "name": "apexos-config-helper",
+  "displayName": "ApexOS Config Helper",
+  "description": "Completion for entity-id's in ApexOS Configurations",
+  "version": "2.2.0",
+  "preview": false,
+  "engines": {
+    "vscode": "^1.99.0"
+  },
+  "categories": [
+    "Other",
+    "Programming Languages",
+    "Formatters",
+    "Snippets"
+  ],
+  "publisher": "apexos",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/apexinfosysindia/config-helper"
+  },
+  "bugs": {
+    "url": "https://github.com/apexinfosysindia/config-helper/issues"
+  },
+  "license": "MIT",
+  "icon": "assets/logo.png",
+  "activationEvents": [
+    "workspaceContains:**/configuration.yaml",
+    "workspaceContains:**/ui-lovelace.yaml",
+    "onLanguage:apexos",
+    "onFileSystem:ftp",
+    "onFileSystem:ssh",
+    "onFileSystem:sftp"
+  ],
+  "keywords": [
+    "apexos",
+    "yaml",
+    "configuration",
+    "automation"
+  ],
+  "main": "./out/extension",
+  "contributes": {
+    "configuration": [
+      {
+        "title": "ApexOS Config Helper",
+        "properties": {
+          "apexos.ignoreCertificates": {
+            "type": "boolean",
+            "description": "Enable insecure transport. Check this if you want to connect over an insecure HTTPS transport with a invalid certificate!"
+          },
+          "apexos.disableAutomaticFileAssociation": {
+            "type": "boolean",
+            "default": false,
+            "description": "Disable automatic association of YAML files with the ApexOS language. When enabled, the extension will not automatically set file associations for YAML files, even in detected ApexOS workspaces."
+          },
+          "apexos.autoRenderTemplates": {
+            "type": "boolean",
+            "default": true,
+            "description": "Enable automatic rendering of ApexOS templates on hover. When enabled, templates will be rendered and displayed as previews when hovering over template values in YAML files."
+          }
+        }
+      }
+    ],
+    "submenus": [
+      {
+        "id": "apexos.reload",
+        "label": "ApexOS: Reload specific integration"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "apexos",
+        "path": "./out/snippets/apexos_automation.json"
+      },
+      {
+        "language": "apexos",
+        "path": "./out/snippets/apexos_script.json"
+      }
+    ],
+    "languages": [
+      {
+        "id": "apexos",
+        "configuration": "./syntaxes/yaml-language-configuration.json",
+        "extensions": [
+          ".yml",
+          ".yaml"
+        ],
+        "aliases": [
+          "ApexOS",
+          "apexos",
+          "apexos"
+        ]
+      },
+      {
+        "comments": "unfortunately this dummy entry is necessary for embedding to work",
+        "id": "apexos-jinja",
+        "configuration": "./jinja-language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "comments": [
+          "YAML syntax as base for ApexOS",
+          "scopeName changed so that we can use it as base for injections"
+        ],
+        "language": "apexos",
+        "scopeName": "source.apexos",
+        "path": "./syntaxes/external/YAML.tmLanguage"
+      },
+      {
+        "comments": [
+          "Jinja syntax as injection into ApexOS YAML",
+          "This is so that we do not need to rely on the Jinja extension being installed"
+        ],
+        "language": "apexos-jinja",
+        "scopeName": "source.apexos-jinja",
+        "path": "./syntaxes/external/jinja.tmLanguage.json"
+      },
+      {
+        "comments": [
+          "Highlighting of ApexOS keywords in Jinja"
+        ],
+        "path": "./syntaxes/apexos/jinja-keywords.tmLanguage",
+        "scopeName": "injection.apexos.jinja-keywords",
+        "injectTo": [
+          "source.apexos"
+        ]
+      },
+      {
+        "comments": [
+          "Additional Jinja grammars"
+        ],
+        "path": "./syntaxes/apexos/jinja-extras.tmLanguage",
+        "scopeName": "injection.apexos.jinja-extras",
+        "injectTo": [
+          "source.apexos"
+        ]
+      },
+      {
+        "comments": [
+          "Support for Jinja in double curly braces"
+        ],
+        "path": "./syntaxes/apexos/jinja-braces.tmLanguage",
+        "scopeName": "injection.apexos.jinja-braces",
+        "embeddedLanguages": {
+          "meta.embedded.inline.jinja": "apexos-jinja"
+        },
+        "injectTo": [
+          "source.apexos"
+        ]
+      },
+      {
+        "comments": [
+          "Support for Jinja in single curly braces with percentage symbol"
+        ],
+        "path": "./syntaxes/apexos/jinja-braces-block.tmLanguage",
+        "scopeName": "injection.apexos.jinja-braces-block",
+        "embeddedLanguages": {
+          "meta.embedded.block.jinja": "apexos-jinja"
+        },
+        "injectTo": [
+          "source.apexos"
+        ]
+      },
+      {
+        "comments": [
+          "Support for Jinja in conditionals"
+        ],
+        "path": "./syntaxes/apexos/jinja-conditionals.tmLanguage",
+        "scopeName": "injection.apexos.jinja-conditionals",
+        "embeddedLanguages": {
+          "meta.embedded.inline.jinja": "apexos-jinja",
+          "meta.embedded.block.jinja": "apexos-jinja"
+        },
+        "injectTo": [
+          "source.apexos"
+        ]
+      },
+      {
+        "comments": [
+          "The quote escapes implemented in the conditionals injection do not work inside brackets etc.",
+          "Support for single quote escapes in Jinja"
+        ],
+        "path": "./syntaxes/apexos/jinja-single-quote-escape.tmLanguage",
+        "scopeName": "injection.apexos.jinja-single-quote-escape",
+        "injectTo": [
+          "source.apexos"
+        ]
+      },
+      {
+        "comments": [
+          "The quote escapes implemented in the conditionals injection do not work inside brackets etc.",
+          "Support for double quote escapes in Jinja"
+        ],
+        "path": "./syntaxes/apexos/jinja-double-quote-escape.tmLanguage",
+        "scopeName": "injection.apexos.jinja-double-quote-escape",
+        "injectTo": [
+          "source.apexos"
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "command": "apexos.reloadAll",
+        "title": "Reload all integrations",
+        "category": "ApexOS"
+      },
+      {
+        "command": "apexos.scriptReload",
+        "title": "Reload Scripts",
+        "category": "ApexOS"
+      },
+      {
+        "command": "apexos.groupReload",
+        "title": "Reload Groups",
+        "category": "ApexOS"
+      },
+      {
+        "command": "apexos.apexosCheckConfig",
+        "title": "Check Configuration (remote!)",
+        "category": "ApexOS"
+      },
+      {
+        "command": "apexos.apexosReloadCoreConfig",
+        "title": "Reload Configuration",
+        "category": "ApexOS"
+      },
+      {
+        "command": "apexos.apexosRestart",
+        "title": "Restart ApexOS",
+        "category": "ApexOS"
+      },
+      {
+        "command": "apexos.automationReload",
+        "title": "Reload Automations",
+        "category": "ApexOS"
+      },
+      {
+        "command": "apexos.conversationReload",
+        "title": "Reload conversation intents",
+        "category": "ApexOS"
+      },
+      {
+        "command": "apexos.sceneReload",
+        "title": "Reload Scenes",
+        "category": "ApexOS"
+      },
+      {
+        "command": "apexos.themeReload",
+        "title": "Reload Themes",
+        "category": "ApexOS"
+      },
+      {
+        "command": "apexos.inputReload",
+        "title": "Reload Inputs",
+        "category": "ApexOS"
+      },
+      {
+        "command": "apexos.homekitReload",
+        "title": "Reload HomeKit",
+        "category": "ApexOS"
+      },
+      {
+        "command": "apexos.filesizeReload",
+        "title": "Reload File Size",
+        "category": "ApexOS"
+      },
+      {
+        "command": "apexos.minMaxReload",
+        "title": "Reload Min/Max",
+        "category": "ApexOS"
+      },
+      {
+        "command": "apexos.genericThermostatReload",
+        "title": "Reload Generic Thermostat",
+        "category": "ApexOS"
+      },
+      {
+        "command": "apexos.genericCameraReload",
+        "title": "Reload Generic Camera",
+        "category": "ApexOS"
+      },
+      {
+        "command": "apexos.pingReload",
+        "title": "Reload Ping",
+        "category": "ApexOS"
+      },
+      {
+        "command": "apexos.trendReload",
+        "title": "Reload Trend",
+        "category": "ApexOS"
+      },
+      {
+        "command": "apexos.historyStatsReload",
+        "title": "Reload History Stats",
+        "category": "ApexOS"
+      },
+      {
+        "command": "apexos.universalReload",
+        "title": "Reload Universal Media Player",
+        "category": "ApexOS"
+      },
+      {
+        "command": "apexos.statisticsReload",
+        "title": "Reload Statistics",
+        "category": "ApexOS"
+      },
+      {
+        "command": "apexos.filterReload",
+        "title": "Reload Filter",
+        "category": "ApexOS"
+      },
+      {
+        "command": "apexos.restReload",
+        "title": "Reload REST",
+        "category": "ApexOS"
+      },
+      {
+        "command": "apexos.commandLineReload",
+        "title": "Reload Command Line",
+        "category": "ApexOS"
+      },
+      {
+        "command": "apexos.bayesianReload",
+        "title": "Reload Bayesian",
+        "category": "ApexOS"
+      },
+      {
+        "command": "apexos.telegramReload",
+        "title": "Reload Telegram",
+        "category": "ApexOS"
+      },
+      {
+        "command": "apexos.smtpReload",
+        "title": "Reload SMTP",
+        "category": "ApexOS"
+      },
+      {
+        "command": "apexos.mqttReload",
+        "title": "Reload MQTT",
+        "category": "ApexOS"
+      },
+      {
+        "command": "apexos.rpioGpioReload",
+        "title": "Reload Raspberry Pi GPIO",
+        "category": "ApexOS"
+      },
+      {
+        "command": "apexos.knxReload",
+        "title": "Reload KNX",
+        "category": "ApexOS"
+      },
+      {
+        "command": "apexos.templateReload",
+        "title": "Reload Template Entities",
+        "category": "ApexOS"
+      },
+      {
+        "command": "apexos.customTemplatesReload",
+        "title": "Reload custom Jinja2 templates",
+        "category": "ApexOS"
+      },
+      {
+        "command": "apexos.supervisorAddonRestartGitPull",
+        "title": "Restart 'Git Pull' Add-on",
+        "category": "ApexOS"
+      },
+      {
+        "command": "apexos.supervisorHostReboot",
+        "title": "Reboot Supervisor Host",
+        "category": "ApexOS"
+      },
+      {
+        "command": "apexos.getErrorLog",
+        "title": "Get Error Logs",
+        "category": "ApexOS"
+      },
+      {
+        "command": "apexos.renderTemplate",
+        "title": "Render Template",
+        "category": "ApexOS"
+      },
+      {
+        "command": "apexos.manageAuth",
+        "title": "Manage ApexOS Authentication",
+        "category": "ApexOS"
+      },
+      {
+        "command": "apexos.debugAuth",
+        "title": "Debug ApexOS Authentication",
+        "category": "ApexOS"
+      },
+      {
+        "command": "apexos.repairAuth",
+        "title": "Repair ApexOS Authentication Configuration",
+        "category": "ApexOS"
+      },
+      {
+        "command": "apexos.testConnection",
+        "title": "Test ApexOS Connection",
+        "category": "ApexOS"
+      },
+      {
+        "command": "apexos.openInBrowser",
+        "title": "Open ApexOS in Browser",
+        "category": "ApexOS"
+      },
+      {
+        "command": "apexos.showReloadIntegrations",
+        "title": "Reload specific integration",
+        "category": "ApexOS"
+      }
+    ],
+    "configurationDefaults": {
+      "[apexos]": {
+        "editor.insertSpaces": true,
+        "editor.tabSize": 2,
+        "editor.quickSuggestions": {
+          "other": true,
+          "comments": false,
+          "strings": true
+        },
+        "editor.autoIndent": "advanced"
+      }
+    },
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "apexos.renderTemplate",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "apexos.showReloadIntegrations"
+        },
+        {
+          "command": "apexos.reloadAll"
+        },
+        {
+          "command": "apexos.apexosReloadCoreConfig",
+          "when": "false"
+        },
+        {
+          "command": "apexos.apexosRestart"
+        },
+        {
+          "command": "apexos.scriptReload",
+          "when": "false"
+        },
+        {
+          "command": "apexos.groupReload",
+          "when": "false"
+        },
+        {
+          "command": "apexos.automationReload",
+          "when": "false"
+        },
+        {
+          "command": "apexos.conversationReload",
+          "when": "false"
+        },
+        {
+          "command": "apexos.sceneReload",
+          "when": "false"
+        },
+        {
+          "command": "apexos.themeReload",
+          "when": "false"
+        },
+        {
+          "command": "apexos.inputReload",
+          "when": "false"
+        },
+        {
+          "command": "apexos.homekitReload",
+          "when": "false"
+        },
+        {
+          "command": "apexos.filesizeReload",
+          "when": "false"
+        },
+        {
+          "command": "apexos.minMaxReload",
+          "when": "false"
+        },
+        {
+          "command": "apexos.genericThermostatReload",
+          "when": "false"
+        },
+        {
+          "command": "apexos.genericCameraReload",
+          "when": "false"
+        },
+        {
+          "command": "apexos.pingReload",
+          "when": "false"
+        },
+        {
+          "command": "apexos.trendReload",
+          "when": "false"
+        },
+        {
+          "command": "apexos.historyStatsReload",
+          "when": "false"
+        },
+        {
+          "command": "apexos.universalReload",
+          "when": "false"
+        },
+        {
+          "command": "apexos.statisticsReload",
+          "when": "false"
+        },
+        {
+          "command": "apexos.filterReload",
+          "when": "false"
+        },
+        {
+          "command": "apexos.restReload",
+          "when": "false"
+        },
+        {
+          "command": "apexos.commandLineReload",
+          "when": "false"
+        },
+        {
+          "command": "apexos.bayesianReload",
+          "when": "false"
+        },
+        {
+          "command": "apexos.telegramReload",
+          "when": "false"
+        },
+        {
+          "command": "apexos.smtpReload",
+          "when": "false"
+        },
+        {
+          "command": "apexos.mqttReload",
+          "when": "false"
+        },
+        {
+          "command": "apexos.rpioGpioReload",
+          "when": "false"
+        },
+        {
+          "command": "apexos.knxReload",
+          "when": "false"
+        },
+        {
+          "command": "apexos.templateReload",
+          "when": "false"
+        },
+        {
+          "command": "apexos.customTemplatesReload",
+          "when": "false"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "apexos.renderTemplate",
+          "group": "apexos",
+          "when": "editorHasSelection"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "apexos.reloadAll",
+          "title": "ApexOS: Quick reload all",
+          "group": "navigation@1",
+          "when": "editorLangId == apexos"
+        },
+        {
+          "command": "apexos.showReloadIntegrations",
+          "title": "ApexOS: Reload specific integration",
+          "group": "navigation@2",
+          "when": "editorLangId == apexos"
+        },
+        {
+          "command": "apexos.apexosRestart",
+          "title": "ApexOS: Restart ApexOS",
+          "group": "navigation@3",
+          "when": "editorLangId == apexos"
+        }
+      ],
+      "apexos.reload": [
+        {
+          "command": "apexos.automationReload",
+          "group": "2_components"
+        },
+        {
+          "command": "apexos.bayesianReload",
+          "group": "2_components"
+        },
+        {
+          "command": "apexos.commandLineReload",
+          "group": "2_components"
+        },
+        {
+          "command": "apexos.conversationReload",
+          "group": "2_components"
+        },
+        {
+          "command": "apexos.customTemplatesReload",
+          "group": "2_components"
+        },
+        {
+          "command": "apexos.filesizeReload",
+          "group": "2_components"
+        },
+        {
+          "command": "apexos.filterReload",
+          "group": "2_components"
+        },
+        {
+          "command": "apexos.genericCameraReload",
+          "group": "2_components"
+        },
+        {
+          "command": "apexos.genericThermostatReload",
+          "group": "2_components"
+        },
+        {
+          "command": "apexos.groupReload",
+          "group": "2_components"
+        },
+        {
+          "command": "apexos.historyStatsReload",
+          "group": "2_components"
+        },
+        {
+          "command": "apexos.homekitReload",
+          "group": "2_components"
+        },
+        {
+          "command": "apexos.apexosReloadCoreConfig",
+          "group": "2_components"
+        },
+        {
+          "command": "apexos.inputReload",
+          "group": "2_components"
+        },
+        {
+          "command": "apexos.knxReload",
+          "group": "2_components"
+        },
+        {
+          "command": "apexos.minMaxReload",
+          "group": "2_components"
+        },
+        {
+          "command": "apexos.mqttReload",
+          "group": "2_components"
+        },
+        {
+          "command": "apexos.pingReload",
+          "group": "2_components"
+        },
+        {
+          "command": "apexos.restReload",
+          "group": "2_components"
+        },
+        {
+          "command": "apexos.rpioGpioReload",
+          "group": "2_components"
+        },
+        {
+          "command": "apexos.sceneReload",
+          "group": "2_components"
+        },
+        {
+          "command": "apexos.scriptReload",
+          "group": "2_components"
+        },
+        {
+          "command": "apexos.smtpReload",
+          "group": "2_components"
+        },
+        {
+          "command": "apexos.statisticsReload",
+          "group": "2_components"
+        },
+        {
+          "command": "apexos.telegramReload",
+          "group": "2_components"
+        },
+        {
+          "command": "apexos.templateReload",
+          "group": "2_components"
+        },
+        {
+          "command": "apexos.themeReload",
+          "group": "2_components"
+        },
+        {
+          "command": "apexos.trendReload",
+          "group": "2_components"
+        },
+        {
+          "command": "apexos.universalReload",
+          "group": "2_components"
+        }
+      ]
+    }
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p src/language-service/tsconfig.json && node src/language-service/dist/schemas/generateSchemas.js --quick && tsc -p ./ ",
+    "format:eslint": "eslint \"**/src/**/*.ts\" --fix",
+    "format:prettier": "prettier \"**/src/**/*.json\" --write",
+    "format": "npm run format:eslint && npm run format:prettier",
+    "lint:eslint": "eslint \"**/src/**/*.ts\"",
+    "lint:prettier": "prettier \"**/src/**/*.json\" --check",
+    "lint:types": "tsc",
+    "lint": "npm run lint:eslint && npm run lint:prettier && npm run lint:types",
+    "schema": "ts-node src/language-service/src/schemas/generateSchemas.ts",
+    "test": "npm run compile && vscode-test",
+    "test:old": "npm run compile && node ./out/test/runTest.js",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@stylistic/eslint-plugin": "^5.5.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "24.10.1",
+    "@types/request": "2.48.13",
+    "@types/vscode": "^1.99.0",
+    "@types/uuid": "^11.0.0",
+    "@types/ws": "8.18.1",
+    "@typescript-eslint/eslint-plugin": "^8.45.0",
+    "@typescript-eslint/parser": "^8.46.2",
+    "@vscode/test-cli": "^0.0.12",
+    "@vscode/test-electron": "^2.5.2",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "glob": "^11.0.3",
+    "mocha": "^11.7.5",
+    "prettier": "^3.6.2",
+    "rimraf": "6.1.0",
+    "ts-loader": "^9.5.4",
+    "ts-node": "10.9.2",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.4",
+    "typescript-json-schema": "0.65.1"
+  },
+  "dependencies": {
+    "axios": "^1.13.2",
+    "bufferutil": "^4.0.9",
+    "home-assistant-js-websocket": "^9.5.0",
+    "utf-8-validate": "^6.0.5",
+    "vscode-json-languageservice": "^5.6.3",
+    "vscode-languageclient": "^9.0.1",
+    "vscode-languageserver": "^9.0.1",
+    "vscode-languageserver-protocol": "3.17.5",
+    "vscode-languageserver-textdocument": "^1.0.12",
+    "vscode-uri": "3.1.0",
+    "ws": "8.18.3",
+    "uuid": "^13.0.0",
+    "yaml": "2.8.1",
+    "yaml-language-server": "1.19.2"
+  }
+}
