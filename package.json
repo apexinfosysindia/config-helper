@@ -2,7 +2,7 @@
   "name": "apexos-config-helper",
   "displayName": "ApexOS Config Helper",
   "description": "Completion for entity-id's in ApexOS Configurations",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "preview": false,
   "engines": {
     "vscode": "^1.99.0"
