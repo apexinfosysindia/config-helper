@@ -21,8 +21,8 @@ export async function debugAuthSettings(context: vscode.ExtensionContext): Promi
   const settingsUrl = config.get<string>("hostUrl");
   
   // Check environment variables
-  const envToken = (process.env.APEX_TOKEN || process.env.HASS_TOKEN) || process.env.SUPERVISOR_TOKEN;
-  const envUrl = (process.env.APEX_SERVER || process.env.HASS_SERVER) || (process.env.SUPERVISOR_TOKEN ? "http://supervisor/core" : undefined);
+  const envToken = process.env.APEX_TOKEN || process.env.SUPERVISOR_TOKEN;
+  const envUrl = process.env.APEX_SERVER || (process.env.SUPERVISOR_TOKEN ? "http://supervisor/core" : undefined);
   
   // Show results
   const debugPanel = vscode.window.createOutputChannel("ApexOS Auth Debug");

@@ -70,8 +70,7 @@ export async function activate(
   const clientOptions: LanguageClientOptions = {
     documentSelector,
     synchronize: {
-      // Legacy-compat: also sync the pre-fork section name
-      configurationSection: ["apexos", "vscode-home-assistant"],
+      configurationSection: ["apexos"],
       fileEvents: fileWatcher,
     },
     initializationOptions: async () => {
@@ -80,10 +79,6 @@ export async function activate(
         const token = await AuthManager.getToken(context);
         const url = await AuthManager.getUrl(context);
         const config = vscode.workspace.getConfiguration("apexos");
-        // Legacy-compat: pre-fork settings section (native values win)
-        const legacyConfig = vscode.workspace.getConfiguration(
-          "vscode-home-assistant",
-        );
 
         console.log("Setting up initialization options for ApexOS language server");
         console.log(`Token available: ${token ? "Yes" : "No"}`);
@@ -93,15 +88,8 @@ export async function activate(
         return {
           "apexos": {
             longLivedAccessToken: token || "",
-            hostUrl:
-              url ||
-              config.get<string>("hostUrl") ||
-              legacyConfig.get<string>("hostUrl") ||
-              "",
-            ignoreCertificates: !!(
-              config.get<boolean>("ignoreCertificates") ??
-              legacyConfig.get<boolean>("ignoreCertificates")
-            )
+            hostUrl: url || config.get<string>("hostUrl") || "",
+            ignoreCertificates: !!config.get<boolean>("ignoreCertificates")
           }
         };
       } catch (error) {
@@ -493,11 +481,7 @@ export async function activate(
   // Check configuration setting to see if automatic file association is disabled
   const config = vscode.workspace.getConfiguration("apexos");
   const disableAutomaticFileAssociation =
-    config.get<boolean>("disableAutomaticFileAssociation", false) ||
-    // Legacy-compat: pre-fork settings section
-    vscode.workspace
-      .getConfiguration("vscode-home-assistant")
-      .get<boolean>("disableAutomaticFileAssociation", false);
+    config.get<boolean>("disableAutomaticFileAssociation", false);
   
   if (disableAutomaticFileAssociation) {
     console.log("Automatic file association is disabled by user setting - skipping file associations");
@@ -537,9 +521,7 @@ export async function activate(
   // Listen for configuration changes that might affect the connection
   context.subscriptions.push(
     vscode.workspace.onDidChangeConfiguration(async (event) => {
-      const apexConfigChanged =
-        event.affectsConfiguration("apexos") ||
-        event.affectsConfiguration("vscode-home-assistant");
+      const apexConfigChanged = event.affectsConfiguration("apexos");
       
       if (apexConfigChanged) {
         console.log("ApexOS configuration changed, updating status bar");
@@ -619,10 +601,6 @@ async function isApexOSWorkspace(): Promise<boolean> {
           "apexos_v2.db",      // ApexOS database
           "apexos.log",        // Log file
           ".APEX_VERSION",     // Version file
-          // Legacy-compat: pre-fork artifacts may survive in migrated configs
-          "home-assistant_v2.db",
-          "home-assistant.log",
-          ".HA_VERSION",
           "automations.yaml",          // Common config file
           "scripts.yaml",              // Common config file
           "scenes.yaml",               // Common config file
@@ -646,8 +624,7 @@ async function isApexOSWorkspace(): Promise<boolean> {
           const configText = Buffer.from(configContent).toString("utf8");
           
           // Simple regex to check for apexos key (with various spacing/formatting)
-          // legacy-compat: also match the pre-fork core section key
-          if (/^\s*(?:apexos|homeassistant)\s*:/m.test(configText)) {
+          if (/^\s*apexos\s*:/m.test(configText)) {
             console.log("ApexOS workspace detected: found \"apexos:\" key in configuration.yaml");
             return true;
           }

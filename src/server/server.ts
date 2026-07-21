@@ -35,9 +35,7 @@ connection.onInitialize(async (params) => {
   // Check if initialization contains the token in custom data
   const apexConfig =
     params.initializationOptions &&
-    (params.initializationOptions["apexos"] ||
-      // Legacy-compat: pre-fork clients send the old section name
-      params.initializationOptions["vscode-home-assistant"]);
+    params.initializationOptions["apexos"];
   
   if (apexConfig) {
     // Extract token

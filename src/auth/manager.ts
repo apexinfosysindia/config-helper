@@ -7,10 +7,6 @@ export class AuthManager {
   private static readonly TOKEN_KEY = "apexos.token";
   private static readonly URL_KEY = "apexos.url";
 
-  // Legacy-compat: pre-fork SecretStorage keys, read once and migrated.
-  private static readonly LEGACY_TOKEN_KEY = "home-assistant.token";
-  private static readonly LEGACY_URL_KEY = "home-assistant.url";
-
   /**
    * Get the stored token from SecretStorage or environment variables
    * @param context Extension context
@@ -18,21 +14,11 @@ export class AuthManager {
    */
   public static async getToken(context: vscode.ExtensionContext): Promise<string | undefined> {
     // First try to get token from SecretStorage
-    let secretToken = await context.secrets.get(AuthManager.TOKEN_KEY);
+    const secretToken = await context.secrets.get(AuthManager.TOKEN_KEY);
 
-    // Legacy-compat: adopt a token stored under the pre-fork key.
-    if (!secretToken) {
-      const legacyToken = await context.secrets.get(AuthManager.LEGACY_TOKEN_KEY);
-      if (legacyToken) {
-        await context.secrets.store(AuthManager.TOKEN_KEY, legacyToken);
-        await context.secrets.delete(AuthManager.LEGACY_TOKEN_KEY);
-        secretToken = legacyToken;
-      }
-    }
-    
     // If no secret token, check environment variables
     if (!secretToken) {
-      const envToken = (process.env.APEX_TOKEN || process.env.HASS_TOKEN) || process.env.SUPERVISOR_TOKEN;
+      const envToken = process.env.APEX_TOKEN || process.env.SUPERVISOR_TOKEN;
       if (envToken) {
         return envToken;
       }
@@ -65,21 +51,11 @@ export class AuthManager {
    */
   public static async getUrl(context: vscode.ExtensionContext): Promise<string | undefined> {
     // First try to get URL from SecretStorage
-    let secretUrl = await context.secrets.get(AuthManager.URL_KEY);
+    const secretUrl = await context.secrets.get(AuthManager.URL_KEY);
 
-    // Legacy-compat: adopt a URL stored under the pre-fork key.
-    if (!secretUrl) {
-      const legacyUrl = await context.secrets.get(AuthManager.LEGACY_URL_KEY);
-      if (legacyUrl) {
-        await context.secrets.store(AuthManager.URL_KEY, legacyUrl);
-        await context.secrets.delete(AuthManager.LEGACY_URL_KEY);
-        secretUrl = legacyUrl;
-      }
-    }
-    
     // If no secret URL, check environment variables
     if (!secretUrl) {
-      const envUrl = (process.env.APEX_SERVER || process.env.HASS_SERVER) || 
+      const envUrl = process.env.APEX_SERVER ||
                     (process.env.SUPERVISOR_TOKEN ? "http://supervisor/core" : undefined);
       if (envUrl) {
         return envUrl;
@@ -124,10 +100,7 @@ export class AuthManager {
    */
   public static async migrateTokenFromSettings(context: vscode.ExtensionContext): Promise<boolean> {
     const config = vscode.workspace.getConfiguration("apexos");
-    const legacyConfig = vscode.workspace.getConfiguration("vscode-home-assistant");
-    const token =
-      config.get<string>("longLivedAccessToken") ||
-      legacyConfig.get<string>("longLivedAccessToken");
+    const token = config.get<string>("longLivedAccessToken");
 
     // If there's no token in settings, nothing to migrate
     if (!token) {
@@ -140,12 +113,7 @@ export class AuthManager {
 
       // Clear from settings
       await config.update("longLivedAccessToken", undefined, vscode.ConfigurationTarget.Global);
-      try {
-        await legacyConfig.update("longLivedAccessToken", undefined, vscode.ConfigurationTarget.Global);
-      } catch {
-        // legacy section not present - nothing to clean up
-      }
-      
+
       // Inform user
       vscode.window.showInformationMessage(
         "Your ApexOS access token has been securely migrated to VS Code's SecretStorage. It is no longer stored in your settings.json file."
@@ -165,9 +133,7 @@ export class AuthManager {
    */
   public static async migrateUrlFromSettings(context: vscode.ExtensionContext): Promise<boolean> {
     const config = vscode.workspace.getConfiguration("apexos");
-    const legacyConfig = vscode.workspace.getConfiguration("vscode-home-assistant");
-    const url =
-      config.get<string>("hostUrl") || legacyConfig.get<string>("hostUrl");
+    const url = config.get<string>("hostUrl");
 
     // If there's no URL in settings, nothing to migrate
     if (!url) {
@@ -180,12 +146,7 @@ export class AuthManager {
 
       // Clear from settings
       await config.update("hostUrl", undefined, vscode.ConfigurationTarget.Global);
-      try {
-        await legacyConfig.update("hostUrl", undefined, vscode.ConfigurationTarget.Global);
-      } catch {
-        // legacy section not present - nothing to clean up
-      }
-      
+
       // Inform user
       vscode.window.showInformationMessage(
         "Your ApexOS instance URL has been securely migrated to VS Code's SecretStorage. It is no longer stored in your settings.json file."
@@ -211,7 +172,7 @@ export class AuthManager {
     // If not in SecretStorage, check settings and environment
     if (!hostUrl) {
       const config = vscode.workspace.getConfiguration("apexos");
-      hostUrl = config.get<string>("hostUrl") || (process.env.APEX_SERVER || process.env.HASS_SERVER) || 
+      hostUrl = config.get<string>("hostUrl") || process.env.APEX_SERVER ||
         (process.env.SUPERVISOR_TOKEN ? "http://supervisor/core" : "");
       
       // If found in settings, migrate it
@@ -259,7 +220,7 @@ export class AuthManager {
     
     // If not found in SecretStorage, check environment variables
     if (!token) {
-      token = (process.env.APEX_TOKEN || process.env.HASS_TOKEN) || process.env.SUPERVISOR_TOKEN;
+      token = process.env.APEX_TOKEN || process.env.SUPERVISOR_TOKEN;
     }
     
     // If not found in SecretStorage or environment, try from settings

@@ -52,7 +52,7 @@ async function setToken(context: vscode.ExtensionContext): Promise<void> {
   // If not in SecretStorage, check settings and environment
   if (!currentUrl) {
     const config = vscode.workspace.getConfiguration("apexos");
-    currentUrl = config.get<string>("hostUrl") || (process.env.APEX_SERVER || process.env.HASS_SERVER) || 
+    currentUrl = config.get<string>("hostUrl") || process.env.APEX_SERVER ||
       (process.env.SUPERVISOR_TOKEN ? "http://supervisor/core" : "");
   }
   

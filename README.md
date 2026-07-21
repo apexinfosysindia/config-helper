@@ -15,9 +15,7 @@ in this order:
 2. Settings: `apexos.hostUrl` (URL); tokens are migrated out of settings into
    SecretStorage on first activation
 3. Environment: `APEX_SERVER` / `APEX_TOKEN`
-4. Legacy environment: `HASS_SERVER` / `HASS_TOKEN` (pre-fork names, still
-   honored; the `APEX_*` names win when both are set)
-5. `SUPERVISOR_TOKEN` (managed installs: URL defaults to
+4. `SUPERVISOR_TOKEN` (managed installs: URL defaults to
    `http://supervisor/core`)
 
 ## Settings
@@ -27,12 +25,6 @@ Section: `apexos.*`
 - `apexos.ignoreCertificates` - allow invalid TLS certificates
 - `apexos.disableAutomaticFileAssociation` - do not auto-associate YAML files
 - `apexos.autoRenderTemplates` - render templates on hover
-
-Legacy compatibility: values still stored under the pre-fork section
-(`vscode-home-assistant.*`) are read as a fallback, and stored
-tokens/instance URLs are migrated to the new location on activation. Boolean
-settings should be moved to `apexos.*` (declared defaults of the new section
-take precedence).
 
 ## Development
 

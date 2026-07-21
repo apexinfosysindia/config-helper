@@ -49,18 +49,9 @@ export class ConfigurationService implements IConfigurationService {
     const prevAutoRenderTemplates = this.autoRenderTemplates;
 
     // Get the ApexOS configuration section
-    const nativeIncoming = config.settings[
+    const incoming = config.settings[
       "apexos"
     ] as ApexOSConfiguration | undefined;
-    // Legacy-compat: honor settings still stored under the pre-fork section
-    // name. Native values win when both sections are present.
-    const legacyIncoming = config.settings[
-      "vscode-home-assistant"
-    ] as ApexOSConfiguration | undefined;
-    const incoming = {
-      ...(legacyIncoming ?? {}),
-      ...(nativeIncoming ?? {}),
-    } as ApexOSConfiguration;
     
     // Update configuration values if we have a valid configuration object
     if (incoming && typeof incoming === "object") {
@@ -121,25 +112,25 @@ export class ConfigurationService implements IConfigurationService {
   };
 
   private setConfigViaEnvironmentVariables() {
-    const envApexServer = (process.env.APEX_SERVER || process.env.HASS_SERVER);
-    const envApexToken = (process.env.APEX_TOKEN || process.env.HASS_TOKEN);
+    const envApexServer = process.env.APEX_SERVER;
+    const envApexToken = process.env.APEX_TOKEN;
     const envSupervisorToken = process.env.SUPERVISOR_TOKEN;
-    
+
     console.log("Checking environment variables for configuration:");
-    console.log(`- APEX_SERVER/HASS_SERVER: ${envApexServer ? "Present" : "Not present"}`);
-    console.log(`- APEX_TOKEN/HASS_TOKEN: ${envApexToken ? "Present" : "Not present"}`);
+    console.log(`- APEX_SERVER: ${envApexServer ? "Present" : "Not present"}`);
+    console.log(`- APEX_TOKEN: ${envApexToken ? "Present" : "Not present"}`);
     console.log(`- SUPERVISOR_TOKEN: ${envSupervisorToken ? "Present" : "Not present"}`);
-    
+
     // Set URL from environment if needed
     if (!this.url && envApexServer) {
       this.url = this.getUri(envApexServer);
-      console.log(`Using URL from APEX_SERVER/HASS_SERVER env var: ${this.url}`);
+      console.log(`Using URL from APEX_SERVER env var: ${this.url}`);
     }
-    
+
     // Set token from environment if needed
     if (!this.token && envApexToken) {
       this.token = envApexToken;
-      console.log(`Using token from APEX_TOKEN/HASS_TOKEN env var (length: ${this.token.length})`);
+      console.log(`Using token from APEX_TOKEN env var (length: ${this.token.length})`);
     }
     
     // Handle Supervisor special case

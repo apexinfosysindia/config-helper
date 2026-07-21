@@ -96,7 +96,7 @@ export class AuthMiddleware {
       
       // Get token from multiple sources
       const secretToken = await AuthManager.getToken(this.context);
-      const envToken = (process.env.APEX_TOKEN || process.env.HASS_TOKEN) || process.env.SUPERVISOR_TOKEN;
+      const envToken = process.env.APEX_TOKEN || process.env.SUPERVISOR_TOKEN;
       
       const config = vscode.workspace.getConfiguration("apexos");
       const settingsToken = config.get<string>("longLivedAccessToken");
@@ -111,7 +111,7 @@ export class AuthMiddleware {
       // Get URL from SecretStorage first, then fallback to other sources
       const secretUrl = await AuthManager.getUrl(this.context);
       const settingsUrl = config.get<string>("hostUrl");
-      const envUrl = (process.env.APEX_SERVER || process.env.HASS_SERVER) || 
+      const envUrl = process.env.APEX_SERVER ||
         (process.env.SUPERVISOR_TOKEN ? "http://supervisor/core" : "");
       
       const hostUrl = secretUrl || settingsUrl || envUrl;
@@ -175,14 +175,14 @@ export class AuthMiddleware {
       for (const item of result) {
         if (item && typeof item === "object" && "apexos" in item) {
           const secretToken = await AuthManager.getToken(this.context);
-          const envToken = (process.env.APEX_TOKEN || process.env.HASS_TOKEN) || process.env.SUPERVISOR_TOKEN;
+          const envToken = process.env.APEX_TOKEN || process.env.SUPERVISOR_TOKEN;
           const config = vscode.workspace.getConfiguration("apexos");
           const settingsToken = config.get<string>("longLivedAccessToken");
           const token = secretToken || envToken || settingsToken;
 
           const secretUrl = await AuthManager.getUrl(this.context);
           const settingsUrl = config.get<string>("hostUrl");
-          const envUrl = (process.env.APEX_SERVER || process.env.HASS_SERVER) ||
+          const envUrl = process.env.APEX_SERVER ||
             (process.env.SUPERVISOR_TOKEN ? "http://supervisor/core" : null);
           const url = secretUrl || settingsUrl || envUrl;
 
@@ -239,7 +239,7 @@ export class AuthMiddleware {
 
           // Fallback URL injection if still not set (original logic)
           const currentSettingsUrlFallback = config.get<string>("hostUrl"); // Re-fetch as it might have been cleared by migration
-          const currentEnvUrlFallback = (process.env.APEX_SERVER || process.env.HASS_SERVER) ||
+          const currentEnvUrlFallback = process.env.APEX_SERVER ||
               (process.env.SUPERVISOR_TOKEN ? "http://supervisor/core" : "");
           const fallbackUrl = currentSettingsUrlFallback || currentEnvUrlFallback;
 
@@ -274,7 +274,7 @@ export class AuthMiddleware {
         
         // Try to get token from multiple sources
         const secretToken = await AuthManager.getToken(this.context);
-        const envToken = (process.env.APEX_TOKEN || process.env.HASS_TOKEN) || process.env.SUPERVISOR_TOKEN;
+        const envToken = process.env.APEX_TOKEN || process.env.SUPERVISOR_TOKEN;
         
         const config = vscode.workspace.getConfiguration("apexos");
         const settingsToken = config.get<string>("longLivedAccessToken");
@@ -284,7 +284,7 @@ export class AuthMiddleware {
         // Try to get URL from SecretStorage first, then fallback to settings
         const secretUrl = await AuthManager.getUrl(this.context);
         const settingsUrl = config.get<string>("hostUrl");
-        const envUrl = (process.env.APEX_SERVER || process.env.HASS_SERVER) || 
+        const envUrl = process.env.APEX_SERVER ||
           (process.env.SUPERVISOR_TOKEN ? "http://supervisor/core" : undefined);
         
         const url = secretUrl || settingsUrl || envUrl;
