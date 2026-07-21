@@ -19,7 +19,7 @@ const ERR_INVALID_AUTH = 2;
 // This allows us to pass custom properties without modifying the original type
 
 interface ApexWebSocket extends WebSocket {
-  haVersion: string;
+  apexVersion: string;
 }
 
 export function createSocket(
@@ -220,7 +220,7 @@ export function createSocket(
         case MSG_TYPE_AUTH_OK:
           console.log("[Auth phase] Authentication successful!");
           removeAllListeners();
-          socket.haVersion = message.ha_version;
+          socket.apexVersion = message.apexos_version;
           promResolve(socket);
           break;
 

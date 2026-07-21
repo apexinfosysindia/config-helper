@@ -237,9 +237,9 @@ export async function testApexOSConnection(
               if (parsedData.version) {
                 // Directly in the version field
                 version = parsedData.version;
-              } else if (parsedData.ha_version) {
-                // Sometimes it's in ha_version
-                version = parsedData.ha_version;
+              } else if (parsedData.apexos_version) {
+                // Sometimes it's in apexos_version
+                version = parsedData.apexos_version;
               } else if (parsedData.config && parsedData.config.version) {
                 // Or nested in config.version
                 version = parsedData.config.version;
